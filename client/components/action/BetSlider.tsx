@@ -59,26 +59,26 @@ export default function BetSlider({ min, max, value, onChange }: BetSliderProps)
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
       >
-        {/* Track背景 */}
-        <div className="absolute w-full h-2 rounded-full bg-gray-700 overflow-hidden">
-          {/* アクティブトラック */}
+        {/* Track background */}
+        <div className="absolute w-full h-1.5 rounded-full bg-surface-3">
+          {/* Active fill */}
           <div
-            className="h-full rounded-full bg-gradient-to-r from-blue-500 via-amber-500 to-red-500"
+            className="h-full rounded-full bg-caution"
             style={{ width: `${percentage}%` }}
           />
         </div>
 
         {/* Thumb */}
         <div
-          className="absolute w-5 h-5 rounded-full bg-white border-2 border-amber-400
-            shadow-[0_0_8px_rgba(251,191,36,0.6)] transform -translate-x-1/2
+          className="absolute w-5 h-5 rounded-full bg-white border-2 border-caution
+            shadow-md transform -translate-x-1/2
             hover:scale-110 transition-transform"
           style={{ left: `${percentage}%` }}
         />
       </div>
 
-      {/* Min / Max ラベル */}
-      <div className="flex justify-between text-[10px] text-gray-500 font-mono mt-0.5">
+      {/* Min / Max labels */}
+      <div className="flex justify-between text-xs text-text-tertiary font-mono mt-0.5">
         <span>{min.toLocaleString()}</span>
         <span>All-in ({max.toLocaleString()})</span>
       </div>

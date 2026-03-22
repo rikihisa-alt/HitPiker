@@ -22,7 +22,6 @@ export default function RoomPage() {
   const gameState = useGameStore((s) => s.gameState);
   const lastResult = useGameStore((s) => s.lastResult);
 
-  // 練習モードでroomId=practiceでなければ、かつplayerIdがなければロビーに戻す
   useEffect(() => {
     if (!roomId) {
       router.push('/');
@@ -52,47 +51,46 @@ export default function RoomPage() {
     : (roomState?.name ?? 'Loading...');
 
   return (
-    <div className="h-screen w-screen bg-gray-900 overflow-hidden relative">
-      {/* トップバー */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-2 bg-gray-900/80 backdrop-blur-sm border-b border-gray-800">
+    <div className="h-screen w-screen bg-surface-0 overflow-hidden relative">
+      {/* Top bar */}
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-2
+        bg-surface-0/90 backdrop-blur-sm border-b border-border-subtle">
         <div className="flex items-center gap-3">
           <button
             onClick={handleLeave}
-            className="text-gray-500 hover:text-gray-300 text-sm transition-colors"
+            className="text-text-tertiary hover:text-text-primary text-sm transition-colors"
           >
             &larr; Leave
           </button>
-          <span className="text-gray-600 text-xs">|</span>
-          <span className="text-amber-400 font-bold text-sm">
+          <span className="text-border text-xs">|</span>
+          <span className="text-text-primary font-medium text-sm">
             {roomName}
           </span>
           {isPracticeMode && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-900/50 text-green-400 border border-green-700/50">
+            <span className="bg-primary-muted text-primary text-[10px] font-medium px-2 py-0.5 rounded-full">
               vs COM
             </span>
           )}
           {!isPracticeMode && (
-            <span className="text-gray-600 text-xs font-mono">
+            <span className="text-text-tertiary text-xs font-mono">
               ID: {roomId}
             </span>
           )}
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-gray-500 text-xs">
+          <span className="text-text-tertiary text-xs">
             {playerCount} players
           </span>
           {gameState && (
-            <span className="text-gray-600 text-xs">
+            <span className="text-text-tertiary text-xs">
               Hand #{gameState.handNumber}
             </span>
           )}
           {canStart && (
             <button
               onClick={startGame}
-              className="px-4 py-1.5 rounded-lg font-bold text-xs
-                bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500
-                text-white border border-green-500 transition-all active:scale-95"
+              className="btn btn-positive px-4 py-1.5 text-xs"
             >
               Start Game
             </button>
@@ -100,85 +98,83 @@ export default function RoomPage() {
         </div>
       </div>
 
-      {/* テーブル */}
+      {/* Table */}
       <div className="absolute inset-0 pt-12">
         <PokerTable />
       </div>
 
-      {/* アクションパネル */}
+      {/* Action panel */}
       <ActionPanel />
 
-      {/* チャット（オンラインのみ） */}
+      {/* Chat (online only) */}
       {!isPracticeMode && <ChatPanel />}
 
-      {/* 結果表示オーバーレイ */}
+      {/* Result overlay */}
       {lastResult && gameState?.phase === 'result' && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-gray-900 rounded-2xl border border-amber-600 shadow-2xl p-6 max-w-sm animate-fade-in">
-            <h2 className="text-center text-amber-400 font-bold text-lg mb-4">Hand Result</h2>
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-surface-0/60 backdrop-blur-md">
+          <div className="bg-surface-1 border border-border rounded-xl shadow-xl p-5 max-w-xs w-full animate-fade-in">
+            <h2 className="text-center text-text-primary font-semibold text-base mb-4">Hand Result</h2>
 
-            {/* 勝者 */}
+            {/* Winners */}
             <div className="space-y-2 mb-4">
               {lastResult.winners.map((w, i) => (
-                <div key={i} className="flex items-center justify-between bg-amber-900/20 rounded-lg px-3 py-2 border border-amber-700/30">
-                  <span className="text-amber-300 font-semibold text-sm">
+                <div key={i} className="flex items-center justify-between bg-positive-muted border border-positive/10 rounded-md px-3 py-2">
+                  <span className="text-positive font-medium text-sm">
                     {gameState.players.find(p => p.id === w.playerId)?.name ?? 'Unknown'}
                   </span>
                   <div className="text-right">
-                    <div className="text-amber-400 font-mono text-sm font-bold">+{w.amount.toLocaleString()}</div>
-                    <div className="text-gray-500 text-xs">{w.handName}</div>
+                    <div className="text-text-primary font-mono text-sm font-bold">+{w.amount.toLocaleString()}</div>
+                    <div className="text-text-tertiary text-xs">{w.handName}</div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* ショーダウン情報 */}
+            {/* Showdown info */}
             {lastResult.showdown.length > 0 && (
-              <div className="border-t border-gray-700 pt-3">
-                <h3 className="text-gray-500 text-xs uppercase tracking-wider mb-2">Showdown</h3>
+              <div className="border-t border-border pt-3">
+                <h3 className="text-text-tertiary text-xs uppercase tracking-wider mb-2">Showdown</h3>
                 <div className="space-y-1">
                   {lastResult.showdown.map((s, i) => (
-                    <div key={i} className="text-xs text-gray-400">
-                      <span className="text-gray-300">{gameState.players.find(p => p.id === s.playerId)?.name}</span>
-                      {' — '}
-                      <span className="text-gray-500">{s.handName}</span>
-                      {s.mustShow && <span className="text-red-400 ml-1">(HIT SHOW)</span>}
+                    <div key={i} className="text-xs text-text-secondary">
+                      <span className="text-text-primary">{gameState.players.find(p => p.id === s.playerId)?.name}</span>
+                      {' \u2014 '}
+                      <span className="text-text-tertiary">{s.handName}</span>
+                      {s.mustShow && <span className="text-danger ml-1">(HIT SHOW)</span>}
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="text-center text-gray-600 text-xs mt-4">
+            <div className="text-center text-text-tertiary text-xs mt-4">
               Next hand starting soon...
             </div>
           </div>
         </div>
       )}
 
-      {/* 待機中の表示（オンラインモードのみ） */}
+      {/* Waiting screen (online mode only) */}
       {!isPracticeMode && !gameState && roomState && (
         <div className="absolute inset-0 pt-12 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-gray-400 text-lg mb-2">Waiting for players...</div>
-            <div className="text-gray-600 text-sm">
+            <div className="text-text-secondary text-base mb-2">Waiting for players...</div>
+            <div className="text-text-tertiary text-sm">
               {playerCount}/{roomState.config.maxPlayers} players in room
             </div>
             {isHost && playerCount >= 2 && (
               <button
                 onClick={startGame}
-                className="mt-4 px-8 py-3 rounded-xl font-bold text-base
-                  bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500
-                  text-white border border-green-500 transition-all active:scale-95 shadow-lg"
+                className="btn btn-positive px-6 py-2.5 text-base mt-4"
               >
                 Start Game
               </button>
             )}
             {isHost && playerCount < 2 && (
-              <div className="mt-2 text-amber-500 text-xs">Need at least 2 players to start</div>
+              <div className="mt-2 text-caution text-xs">Need at least 2 players to start</div>
             )}
             {!isHost && (
-              <div className="mt-2 text-gray-600 text-xs">Waiting for host to start the game</div>
+              <div className="mt-2 text-text-tertiary text-xs">Waiting for host to start the game</div>
             )}
           </div>
         </div>

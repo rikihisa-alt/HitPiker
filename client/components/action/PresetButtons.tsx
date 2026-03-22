@@ -12,13 +12,15 @@ interface PresetButtonsProps {
 export default function PresetButtons({ isPreflop, onBBPreset, onPotPreset, onAllIn }: PresetButtonsProps) {
   if (isPreflop) {
     return (
-      <div className="flex gap-1.5 flex-wrap">
+      <div className="flex flex-wrap gap-1.5">
         {PRESET_RATIOS.preflop.map((preset) => (
           <button
             key={preset.label}
             onClick={() => onBBPreset(preset.multiplier)}
-            className="px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-amber-300 text-xs font-bold
-              border border-gray-600 transition-colors active:scale-95"
+            className="text-xs font-medium px-3 py-1.5 rounded-full
+              bg-surface-3 text-text-secondary border border-border
+              hover:border-border-strong hover:text-text-primary
+              transition-colors active:scale-95"
           >
             {preset.label}
           </button>
@@ -28,7 +30,7 @@ export default function PresetButtons({ isPreflop, onBBPreset, onPotPreset, onAl
   }
 
   return (
-    <div className="flex gap-1.5 flex-wrap">
+    <div className="flex flex-wrap gap-1.5">
       {PRESET_RATIOS.postflop.map((preset) => (
         <button
           key={preset.label}
@@ -39,10 +41,11 @@ export default function PresetButtons({ isPreflop, onBBPreset, onPotPreset, onAl
               onPotPreset(preset.ratio!);
             }
           }}
-          className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors active:scale-95
+          className={`text-xs font-medium px-3 py-1.5 rounded-full
+            border transition-colors active:scale-95
             ${preset.type === 'allin'
-              ? 'bg-red-700 hover:bg-red-600 text-white border-red-600'
-              : 'bg-gray-700 hover:bg-gray-600 text-amber-300 border-gray-600'
+              ? 'bg-surface-3 text-danger border-danger/30 hover:border-danger/50 hover:text-danger'
+              : 'bg-surface-3 text-text-secondary border-border hover:border-border-strong hover:text-text-primary'
             }`}
         >
           {preset.label}

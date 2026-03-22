@@ -35,12 +35,16 @@ export default function ChatPanel() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 left-4 z-40 bg-gray-800/80 hover:bg-gray-700 backdrop-blur-sm
-          rounded-full p-3 border border-gray-600 shadow-lg transition-colors"
+        className="fixed bottom-6 left-4 z-40 bg-surface-2 border border-border
+          rounded-full p-2.5 text-text-secondary hover:text-text-primary
+          shadow-md transition-colors relative"
       >
-        <span className="text-lg">💬</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
         {chatMessages.length > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 bg-danger text-white text-[10px]
+            w-4 h-4 rounded-full flex items-center justify-center font-bold">
             {Math.min(chatMessages.length, 9)}
           </span>
         )}
@@ -49,35 +53,35 @@ export default function ChatPanel() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-40 w-72 animate-slide-up">
-      <div className="bg-gray-900/95 backdrop-blur-md rounded-2xl border border-gray-700 shadow-2xl overflow-hidden">
-        {/* ヘッダー */}
-        <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700">
-          <span className="text-gray-300 text-sm font-semibold">Chat</span>
+    <div className="fixed bottom-6 left-4 z-40 w-72 animate-slide-up">
+      <div className="panel-elevated overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+          <span className="text-text-primary text-sm font-semibold">Chat</span>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-gray-500 hover:text-gray-300 text-lg leading-none"
+            className="text-text-tertiary hover:text-text-primary text-lg leading-none transition-colors"
           >
             &times;
           </button>
         </div>
 
-        {/* メッセージ一覧 */}
+        {/* Messages */}
         <div ref={scrollRef} className="h-48 overflow-y-auto p-2 space-y-1">
           {chatMessages.length === 0 ? (
-            <div className="text-gray-600 text-xs text-center py-4">No messages yet</div>
+            <div className="text-text-tertiary text-xs text-center py-4">No messages yet</div>
           ) : (
             chatMessages.map((msg, i) => (
               <div key={i} className="text-xs">
-                <span className="text-amber-400 font-semibold">{msg.playerName}: </span>
-                <span className="text-gray-300">{msg.text}</span>
+                <span className="text-primary font-semibold">{msg.playerName}: </span>
+                <span className="text-text-secondary">{msg.text}</span>
               </div>
             ))
           )}
         </div>
 
-        {/* 入力エリア */}
-        <div className="flex border-t border-gray-700">
+        {/* Input area */}
+        <div className="flex border-t border-border">
           <input
             type="text"
             value={message}
@@ -85,12 +89,12 @@ export default function ChatPanel() {
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             maxLength={200}
-            className="flex-1 bg-transparent px-3 py-2 text-sm text-gray-300
-              placeholder-gray-600 focus:outline-none"
+            className="flex-1 bg-transparent px-3 py-2 text-sm text-text-primary
+              placeholder-text-tertiary focus:outline-none"
           />
           <button
             onClick={handleSend}
-            className="px-3 py-2 text-amber-400 hover:text-amber-300 text-sm font-bold"
+            className="px-3 py-2 text-primary hover:text-primary-hover text-sm font-medium transition-colors"
           >
             Send
           </button>

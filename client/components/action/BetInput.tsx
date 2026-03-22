@@ -34,18 +34,18 @@ export default function BetInput({ value, min, max, onChange }: BetInputProps) {
   }, []);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5">
       <input
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        className="w-28 px-3 py-1.5 bg-gray-800 border border-gray-600 rounded-lg text-amber-300
-          text-center font-mono text-sm focus:border-amber-500 focus:outline-none
-          focus:ring-1 focus:ring-amber-500/50"
+        className="w-24 bg-surface-2 border border-border text-text-primary
+          font-mono text-sm text-center rounded-md px-2 py-1.5
+          focus:border-caution focus:outline-none focus:ring-1 focus:ring-caution/30"
       />
-      <span className="text-gray-500 text-xs">chips</span>
+      <span className="text-text-tertiary text-xs">chips</span>
     </div>
   );
 }

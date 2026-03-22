@@ -11,17 +11,17 @@ export default function BoardCards({ cards }: BoardCardsProps) {
   if (cards.length === 0) return null;
 
   return (
-    <div className="flex gap-2 animate-fade-in">
+    <div className="flex gap-2">
       {cards.map((card, i) => (
-        <div key={`${card.suit}-${card.rank}-${i}`} className="animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
+        <div key={`${card.suit}-${card.rank}-${i}`} className="animate-fade-in">
           <CardComponent card={card} size="md" />
         </div>
       ))}
-      {/* 空スロット表示 */}
+      {/* Empty slots */}
       {Array.from({ length: 5 - cards.length }).map((_, i) => (
         <div
           key={`empty-${i}`}
-          className="w-14 h-20 rounded-lg border-2 border-dashed border-green-700/30"
+          className="w-12 h-[68px] rounded-md bg-surface-3/30"
         />
       ))}
     </div>

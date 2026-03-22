@@ -87,9 +87,9 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className={`flex items-center gap-4 bg-black/40 backdrop-blur-sm rounded-2xl px-6 py-3 border
+        className={`flex items-center gap-4 bg-surface-1 backdrop-blur-sm rounded-xl px-6 py-3 border
           ${canFold ? 'cursor-grab active:cursor-grabbing' : ''}
-          ${isDragging ? 'border-red-500/50' : 'border-gray-700/50'}
+          ${isDragging ? 'border-danger/40' : 'border-border'}
           ${isFolding ? 'transition-all duration-300' : isDragging ? '' : 'transition-all duration-200'}`}
         style={{
           transform: `translateY(${dragY}px) scale(${scale}) rotate(${rotation}deg)`,
@@ -113,23 +113,23 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
         )}
       </div>
 
-      {/* ドラッグヒント */}
+      {/* Drag hint */}
       {canFold && !isDragging && !isFolding && (
-        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-600 whitespace-nowrap animate-pulse">
-          ↓ drag to fold
+        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-text-tertiary whitespace-nowrap animate-pulse">
+          drag to fold
         </div>
       )}
 
-      {/* フォールド確認インジケーター */}
+      {/* Fold confirmation indicator */}
       {isDragging && progress > 0.3 && (
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
           style={{ opacity: progress }}
         >
-          <div className={`px-4 py-1.5 rounded-full text-sm font-bold border
+          <div className={`px-4 py-1.5 rounded-full text-sm font-semibold border
             ${progress >= 1
-              ? 'bg-red-600 text-white border-red-500'
-              : 'bg-red-900/60 text-red-300 border-red-700/50'
+              ? 'bg-danger text-white border-danger'
+              : 'bg-danger-muted text-danger border-danger/30'
             }`}
           >
             {progress >= 1 ? 'Release to FOLD' : 'FOLD'}

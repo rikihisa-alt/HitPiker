@@ -54,12 +54,12 @@ export default function ActionPanel() {
   const canBetOrRaise = canBet || canRaise;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 animate-slide-up">
-      <div className="bg-gray-900/95 backdrop-blur-md rounded-2xl border border-gray-700 shadow-2xl p-4 min-w-[320px]">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm mx-4 animate-slide-up">
+      <div className="bg-surface-1 border border-border rounded-xl shadow-xl p-3">
 
-        {/* Bet/Raise エリア */}
+        {/* Bet/Raise area */}
         {betMode && (
-          <div className="mb-4 space-y-3 border-b border-gray-700 pb-4">
+          <div className="mb-3 space-y-2.5 border-b border-border pb-3">
             <PresetButtons
               isPreflop={isPreflop}
               onBBPreset={bbPreset}
@@ -83,41 +83,39 @@ export default function ActionPanel() {
           </div>
         )}
 
-        {/* メインアクションボタン */}
+        {/* Main action buttons */}
         <div className="flex gap-2">
           {/* FOLD */}
           {canFold && (
             <button
               onClick={() => handleAction('fold')}
-              className="flex-1 py-3 px-4 rounded-xl font-bold text-sm
-                bg-gray-700 hover:bg-gray-600 text-gray-300
-                border border-gray-600 transition-all active:scale-95"
+              className="btn btn-ghost flex-1 text-sm py-3 rounded-md active:scale-[0.97]"
             >
               FOLD
             </button>
           )}
 
-          {/* CHECK / CALL */}
+          {/* CHECK */}
           {canCheck && (
             <button
               onClick={() => handleAction('check')}
-              className="flex-1 py-3 px-4 rounded-xl font-bold text-sm
-                bg-blue-600 hover:bg-blue-500 text-white
-                border border-blue-500 transition-all active:scale-95"
+              className="btn btn-positive flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
             >
               CHECK
             </button>
           )}
+
+          {/* CALL */}
           {canCall && (
             <button
               onClick={() => handleAction('call')}
-              className="flex-1 py-3 px-4 rounded-xl font-bold text-sm
-                bg-blue-600 hover:bg-blue-500 text-white
-                border border-blue-500 transition-all active:scale-95"
+              className="btn btn-primary flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
             >
-              <div>CALL</div>
-              <div className="text-xs font-mono text-blue-200">
-                {callAmount.toLocaleString()}
+              <div className="flex flex-col items-center">
+                <span>CALL</span>
+                <span className="text-[11px] font-mono opacity-80">
+                  {callAmount.toLocaleString()}
+                </span>
               </div>
             </button>
           )}
@@ -127,34 +125,30 @@ export default function ActionPanel() {
             betMode ? (
               <button
                 onClick={() => handleAction(canBet ? 'bet' : 'raise', betAmount)}
-                className="flex-1 py-3 px-4 rounded-xl font-bold text-sm
-                  bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white
-                  border border-amber-500 transition-all active:scale-95 shadow-lg shadow-amber-900/30"
+                className="btn btn-caution flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
               >
-                <div>{canBet ? 'BET' : 'RAISE'}</div>
-                <div className="text-xs font-mono text-amber-200">
-                  {betAmount.toLocaleString()}
+                <div className="flex flex-col items-center">
+                  <span>{canBet ? 'BET' : 'RAISE'}</span>
+                  <span className="text-[11px] font-mono opacity-80">
+                    {betAmount.toLocaleString()}
+                  </span>
                 </div>
               </button>
             ) : (
               <button
                 onClick={openBetMode}
-                className="flex-1 py-3 px-4 rounded-xl font-bold text-sm
-                  bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white
-                  border border-amber-500 transition-all active:scale-95 shadow-lg shadow-amber-900/30"
+                className="btn btn-caution flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
               >
                 {canBet ? 'BET' : 'RAISE'}
               </button>
             )
           )}
 
-          {/* ALL-IN（bet/raiseが使えない場合のフォールバック） */}
+          {/* ALL-IN (fallback when bet/raise unavailable) */}
           {canAllIn && !canBetOrRaise && (
             <button
               onClick={() => handleAction('all-in')}
-              className="flex-1 py-3 px-4 rounded-xl font-bold text-sm
-                bg-red-700 hover:bg-red-600 text-white
-                border border-red-600 transition-all active:scale-95"
+              className="btn btn-danger flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
             >
               ALL-IN
             </button>

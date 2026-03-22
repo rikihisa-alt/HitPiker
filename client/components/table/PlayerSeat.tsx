@@ -13,21 +13,21 @@ interface PlayerSeatProps {
 }
 
 const ACTION_LABELS: Record<string, { text: string; color: string }> = {
-  fold: { text: 'FOLD', color: 'bg-gray-600' },
-  check: { text: 'CHECK', color: 'bg-blue-600' },
-  call: { text: 'CALL', color: 'bg-blue-500' },
-  bet: { text: 'BET', color: 'bg-amber-600' },
-  raise: { text: 'RAISE', color: 'bg-orange-600' },
-  'all-in': { text: 'ALL-IN', color: 'bg-red-600' },
+  fold: { text: 'FOLD', color: 'text-text-tertiary' },
+  check: { text: 'CHECK', color: 'text-positive' },
+  call: { text: 'CALL', color: 'text-primary' },
+  bet: { text: 'BET', color: 'text-caution' },
+  raise: { text: 'RAISE', color: 'text-caution' },
+  'all-in': { text: 'ALL-IN', color: 'text-danger' },
 };
 
 export default function PlayerSeat({ player, isCurrentTurn, isSelf, position }: PlayerSeatProps) {
   const turnRing = isCurrentTurn
-    ? 'ring-4 ring-amber-400 animate-pulse-glow'
+    ? 'ring-2 ring-primary animate-turn-pulse'
     : '';
 
   const foldedOpacity = player.folded ? 'opacity-40' : '';
-  const disconnectedBorder = player.disconnected ? 'border-red-500' : 'border-gray-700';
+  const disconnectedBorder = player.disconnected ? 'border-danger/40' : 'border-border';
 
   return (
     <div
@@ -35,7 +35,7 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position }: 
       style={{ top: position.top, left: position.left }}
     >
       <div className={`flex flex-col items-center gap-1 ${foldedOpacity}`}>
-        {/* カード表示 */}
+        {/* Hole cards above seat */}
         {!isSelf && player.holeCards.length > 0 && (
           <div className="flex gap-0.5 mb-1">
             {player.holeCards.map((card, i) => (
@@ -44,60 +44,60 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position }: 
           </div>
         )}
 
-        {/* プレイヤー情報ボックス */}
-        <div className={`rounded-xl border-2 ${disconnectedBorder} ${turnRing}
-          bg-gradient-to-b from-gray-800 to-gray-900 shadow-xl
+        {/* Player info box */}
+        <div className={`rounded-lg border ${disconnectedBorder} ${turnRing}
+          bg-surface-1 shadow-sm
           px-3 py-2 min-w-[100px] text-center`}>
 
-          {/* ポジションマーカー */}
+          {/* Position badges */}
           <div className="flex justify-center gap-1 mb-1">
             {player.isDealer && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-500 text-black font-bold">D</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-surface-3 text-text-secondary font-semibold">D</span>
             )}
             {player.isSB && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-400 text-black font-bold">SB</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary-muted text-primary font-semibold">SB</span>
             )}
             {player.isBB && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-400 text-black font-bold">BB</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-positive-muted text-positive font-semibold">BB</span>
             )}
           </div>
 
-          {/* 名前 */}
-          <div className="text-white text-sm font-semibold truncate max-w-[90px]">
+          {/* Name */}
+          <div className="text-sm font-medium text-text-primary truncate max-w-[90px]">
             {player.name}
           </div>
 
-          {/* スタック */}
-          <div className="text-amber-400 text-xs font-mono">
+          {/* Stack */}
+          <div className="font-mono text-xs text-text-secondary">
             {player.stack.toLocaleString()}
           </div>
 
-          {/* 最後のアクション */}
+          {/* Last action */}
           {player.lastAction && (
             <div className="mt-1">
-              <span className={`text-[10px] px-2 py-0.5 rounded-full text-white font-bold
-                ${ACTION_LABELS[player.lastAction]?.color ?? 'bg-gray-500'}`}>
+              <span className={`text-[10px] font-semibold
+                ${ACTION_LABELS[player.lastAction]?.color ?? 'text-text-tertiary'}`}>
                 {ACTION_LABELS[player.lastAction]?.text ?? player.lastAction.toUpperCase()}
               </span>
             </div>
           )}
 
-          {/* 切断表示 */}
+          {/* Disconnected indicator */}
           {player.disconnected && (
-            <div className="mt-1 text-[10px] text-red-400 font-bold">
-              ⚠ DISCONNECTED
+            <div className="mt-1 text-[10px] text-danger font-semibold">
+              DISCONNECTED
             </div>
           )}
         </div>
 
-        {/* ベット額 */}
+        {/* Current bet */}
         {player.currentBet > 0 && (
-          <div className="mt-1 bg-gray-900/80 rounded-full px-2 py-0.5 text-amber-300 text-xs font-mono border border-amber-700">
+          <div className="mt-1 bg-surface-2 rounded-full px-2 py-0.5 text-text-secondary text-xs font-mono border border-border-subtle">
             {player.currentBet.toLocaleString()}
           </div>
         )}
 
-        {/* HIT / SHOW LOCK バッジ */}
+        {/* HIT / SHOW badges */}
         <div className="flex gap-1 mt-1">
           {player.hit.hitRevealed && (
             <HitBadge hitSource={player.hit.hitSource} size="sm" />
