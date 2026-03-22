@@ -5,7 +5,13 @@
   "scripts": {
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm install && npm run build",
     "install:all": "cd server && npm install && cd ../client && npm install",
     "test": "cd server && npm test"
+  },
+  "dependencies": {
+    "next": "14.2.3",
+    "react": "^18",
+    "react-dom": "^18"
   }
 }
