@@ -15,6 +15,7 @@ interface GameStore {
   playerName: string | null;
   chatMessages: ChatMessage[];
   lastResult: HandResult | null;
+  isPracticeMode: boolean;
 
   // ベットUI状態
   betMode: boolean;
@@ -30,6 +31,7 @@ interface GameStore {
   setRoomInfo: (roomId: string, playerId: string, name: string) => void;
   addChatMessage: (msg: ChatMessage) => void;
   setLastResult: (result: HandResult | null) => void;
+  setIsPracticeMode: (mode: boolean) => void;
   reset: () => void;
 }
 
@@ -42,6 +44,7 @@ export const useGameStore = create<GameStore>((set) => ({
   playerName: null,
   chatMessages: [],
   lastResult: null,
+  isPracticeMode: false,
   betMode: false,
   betAmount: 0,
 
@@ -59,6 +62,7 @@ export const useGameStore = create<GameStore>((set) => ({
     chatMessages: [...s.chatMessages.slice(-99), msg],
   })),
   setLastResult: (result) => set({ lastResult: result }),
+  setIsPracticeMode: (mode) => set({ isPracticeMode: mode }),
   reset: () => set({
     gameState: null,
     myHoleCards: [],
@@ -68,6 +72,7 @@ export const useGameStore = create<GameStore>((set) => ({
     playerName: null,
     chatMessages: [],
     lastResult: null,
+    isPracticeMode: false,
     betMode: false,
     betAmount: 0,
   }),

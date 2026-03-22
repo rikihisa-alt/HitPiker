@@ -111,6 +111,26 @@ export default function LobbyPage() {
           </div>
         )}
 
+        {/* 練習モード */}
+        <div className="mb-6">
+          <button
+            onClick={() => router.push('/practice')}
+            className="w-full py-4 rounded-2xl font-bold text-base
+              bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500
+              text-white border border-green-500 transition-all active:scale-[0.98]
+              shadow-lg shadow-green-600/20"
+          >
+            🎮 Practice Mode (vs COM)
+          </button>
+          <p className="text-center text-gray-600 text-xs mt-1.5">No server required — play instantly</p>
+        </div>
+
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex-1 border-t border-gray-700/50" />
+          <span className="text-gray-600 text-xs uppercase tracking-wider">or play online</span>
+          <div className="flex-1 border-t border-gray-700/50" />
+        </div>
+
         {/* プレイヤー名 */}
         <div className="mb-6">
           <label className="block text-gray-400 text-xs mb-1 font-semibold uppercase tracking-wider">

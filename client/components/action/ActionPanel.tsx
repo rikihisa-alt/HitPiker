@@ -5,6 +5,7 @@ import { useGameState } from '../../hooks/useGameState';
 import { useGameStore } from '../../store/game-store';
 import { useBetControl } from '../../hooks/useBetControl';
 import { useSocket } from '../../hooks/useSocket';
+import { useLocalGame } from '../../hooks/useLocalGame';
 import BetSlider from './BetSlider';
 import PresetButtons from './PresetButtons';
 import BetInput from './BetInput';
@@ -13,7 +14,10 @@ import { GameAction } from '../../../shared/types/game';
 export default function ActionPanel() {
   const { isMyTurn, availableActions, gameState } = useGameState();
   const playerId = useGameStore((s) => s.playerId);
-  const { sendAction } = useSocket();
+  const isPracticeMode = useGameStore((s) => s.isPracticeMode);
+  const { sendAction: sendSocketAction } = useSocket();
+  const { sendAction: sendLocalAction } = useLocalGame();
+  const sendAction = isPracticeMode ? sendLocalAction : sendSocketAction;
   const {
     betAmount,
     setBetAmount,

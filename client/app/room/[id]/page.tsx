@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSocket } from '../../../hooks/useSocket';
+import { useLocalGame } from '../../../hooks/useLocalGame';
 import { useGameStore } from '../../../store/game-store';
 import { useSocketStore } from '../../../store/socket-store';
 import PokerTable from '../../../components/table/PokerTable';
@@ -13,27 +14,42 @@ export default function RoomPage() {
   const params = useParams();
   const router = useRouter();
   const roomId = params.id as string;
+  const isPracticeMode = useGameStore((s) => s.isPracticeMode);
   const { startGame, leaveRoom } = useSocket();
+  const { stopGame } = useLocalGame();
   const { roomState } = useSocketStore();
   const playerId = useGameStore((s) => s.playerId);
   const gameState = useGameStore((s) => s.gameState);
   const lastResult = useGameStore((s) => s.lastResult);
 
-  // ルームIDがない場合はロビーに戻る
+  // 練習モードでroomId=practiceでなければ、かつplayerIdがなければロビーに戻す
   useEffect(() => {
     if (!roomId) {
       router.push('/');
     }
-  }, [roomId, router]);
+    if (isPracticeMode && roomId !== 'practice') {
+      router.push('/');
+    }
+  }, [roomId, router, isPracticeMode]);
 
   const isHost = roomState?.hostId === playerId;
-  const playerCount = roomState?.players.length ?? 0;
-  const canStart = isHost && playerCount >= 2 && !roomState?.gameInProgress;
+  const playerCount = isPracticeMode
+    ? (gameState?.players.length ?? 0)
+    : (roomState?.players.length ?? 0);
+  const canStart = !isPracticeMode && isHost && playerCount >= 2 && !roomState?.gameInProgress;
 
   const handleLeave = () => {
-    leaveRoom();
+    if (isPracticeMode) {
+      stopGame();
+    } else {
+      leaveRoom();
+    }
     router.push('/');
   };
+
+  const roomName = isPracticeMode
+    ? 'Practice Mode'
+    : (roomState?.name ?? 'Loading...');
 
   return (
     <div className="h-screen w-screen bg-gray-900 overflow-hidden relative">
@@ -48,17 +64,29 @@ export default function RoomPage() {
           </button>
           <span className="text-gray-600 text-xs">|</span>
           <span className="text-amber-400 font-bold text-sm">
-            {roomState?.name ?? 'Loading...'}
+            {roomName}
           </span>
-          <span className="text-gray-600 text-xs font-mono">
-            ID: {roomId}
-          </span>
+          {isPracticeMode && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-900/50 text-green-400 border border-green-700/50">
+              vs COM
+            </span>
+          )}
+          {!isPracticeMode && (
+            <span className="text-gray-600 text-xs font-mono">
+              ID: {roomId}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
           <span className="text-gray-500 text-xs">
-            {playerCount}/{roomState?.config.maxPlayers ?? 6} players
+            {playerCount} players
           </span>
+          {gameState && (
+            <span className="text-gray-600 text-xs">
+              Hand #{gameState.handNumber}
+            </span>
+          )}
           {canStart && (
             <button
               onClick={startGame}
@@ -80,13 +108,13 @@ export default function RoomPage() {
       {/* アクションパネル */}
       <ActionPanel />
 
-      {/* チャット */}
-      <ChatPanel />
+      {/* チャット（オンラインのみ） */}
+      {!isPracticeMode && <ChatPanel />}
 
       {/* 結果表示オーバーレイ */}
       {lastResult && gameState?.phase === 'result' && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-gray-900 rounded-2xl border border-amber-600 shadow-2xl p-6 max-w-sm">
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-2xl border border-amber-600 shadow-2xl p-6 max-w-sm animate-fade-in">
             <h2 className="text-center text-amber-400 font-bold text-lg mb-4">Hand Result</h2>
 
             {/* 勝者 */}
@@ -128,8 +156,8 @@ export default function RoomPage() {
         </div>
       )}
 
-      {/* 待機中の表示 */}
-      {!gameState && roomState && (
+      {/* 待機中の表示（オンラインモードのみ） */}
+      {!isPracticeMode && !gameState && roomState && (
         <div className="absolute inset-0 pt-12 flex items-center justify-center">
           <div className="text-center">
             <div className="text-gray-400 text-lg mb-2">Waiting for players...</div>
