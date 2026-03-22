@@ -1,11 +1,14 @@
 'use client';
 
+import { useCallback } from 'react';
 import { useGameState } from '../../hooks/useGameState';
 import PlayerSeat from './PlayerSeat';
 import BoardCards from './BoardCards';
 import PotDisplay from './PotDisplay';
 import HoleCards from './HoleCards';
 import { useGameStore } from '../../store/game-store';
+import { useSocket } from '../../hooks/useSocket';
+import { useLocalGame } from '../../hooks/useLocalGame';
 
 // 6人卓の座席位置（楕円配置）
 const SEAT_POSITIONS: { top: string; left: string }[] = [
@@ -18,8 +21,19 @@ const SEAT_POSITIONS: { top: string; left: string }[] = [
 ];
 
 export default function PokerTable() {
-  const { gameState, myPlayer, myHoleCards } = useGameState();
+  const { gameState, myPlayer, myHoleCards, isMyTurn, availableActions } = useGameState();
   const playerId = useGameStore((s) => s.playerId);
+  const isPracticeMode = useGameStore((s) => s.isPracticeMode);
+  const { sendAction: sendSocketAction } = useSocket();
+  const { sendAction: sendLocalAction } = useLocalGame();
+  const sendAction = isPracticeMode ? sendLocalAction : sendSocketAction;
+
+  const canFold = isMyTurn && availableActions.includes('fold');
+
+  const handleDragFold = useCallback(() => {
+    if (!playerId || !canFold) return;
+    sendAction({ playerId, type: 'fold' });
+  }, [playerId, canFold, sendAction]);
 
   if (!gameState) {
     return (
@@ -72,7 +86,7 @@ export default function PokerTable() {
 
       {/* 自分のホールカード（画面下部中央） */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20">
-        <HoleCards cards={myHoleCards} player={myPlayer} />
+        <HoleCards cards={myHoleCards} player={myPlayer} canFold={canFold} onFold={handleDragFold} />
       </div>
 
       {/* フェーズ表示 */}
