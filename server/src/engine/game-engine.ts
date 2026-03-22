@@ -282,34 +282,32 @@ export function applyAction(
  */
 function shouldEndStreet(state: GameState, lastActorIndex: number): boolean {
   const activePlayers = state.players.filter(p => !p.folded && !p.allIn);
+  const nonFolded = state.players.filter(p => !p.folded);
 
-  // アクティブ1人以下 → 終了
-  if (activePlayers.length <= 1) {
-    // フォールドしてないプレイヤーが1人以下なら即終了
-    const nonFolded = state.players.filter(p => !p.folded);
-    if (nonFolded.length <= 1) return true;
-    if (activePlayers.length === 0) return true; // 全員オールインorフォールド
+  // Only 1 non-folded player remaining → hand over
+  if (nonFolded.length <= 1) return true;
+
+  // All remaining players are all-in (no one can act) → end street
+  if (activePlayers.length === 0) return true;
+
+  // If only 1 active player and their bet matches currentBet, end street
+  // (everyone else is all-in or folded)
+  if (activePlayers.length === 1) {
+    const solo = activePlayers[0];
+    if (solo.currentBet >= state.currentBet) return true;
+    // Solo player still needs to call
+    if (solo.lastAction !== null) return true;
+    return false;
   }
 
-  // 全アクティブプレイヤーのベットが揃っているかチェック
-  const allBetsEqual = activePlayers.every(
-    p => p.currentBet === state.currentBet
-  );
+  // Check if ALL active players have acted AND bets are equal
+  const allActed = activePlayers.every(p => p.lastAction !== null);
+  const allBetsEqual = activePlayers.every(p => p.currentBet === state.currentBet);
 
+  if (!allActed) return false;
   if (!allBetsEqual) return false;
 
-  // 全員がアクション済みかチェック（プリフロップBBオプション考慮）
-  const nextPlayer = findNextActivePlayer(state, lastActorIndex);
-  if (nextPlayer === lastActorIndex) return true; // 一周した
-
-  // 全アクティブプレイヤーがアクション済みかチェック
-  for (const p of activePlayers) {
-    if (p.lastAction === null && p.currentBet < state.currentBet) {
-      return false; // まだアクションしていないプレイヤーがいる
-    }
-  }
-
-  // BBオプション: プリフロップでBBがまだアクションしていない場合
+  // BB option: preflop, BB hasn't acted yet and no one raised
   if (state.phase === 'preflop') {
     const bb = state.players.find(p => p.isBB);
     if (bb && !bb.folded && !bb.allIn && bb.lastAction === null) {

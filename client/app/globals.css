@@ -218,3 +218,23 @@
     text-wrap: balance;
   }
 }
+
+/* Chip delta float animation */
+@keyframes chip-float {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0);
+  }
+  15% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-16px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-28px);
+  }
+}

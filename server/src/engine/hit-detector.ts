@@ -24,14 +24,35 @@ export function detectBoardHit(
 ): boolean {
   if (holeCards.length !== 2) return false;
 
-  const prevHandRank = getBestHandRank([...holeCards, ...prevBoard]);
-  const newHandRank = getBestHandRank([...holeCards, ...board]);
+  // Check if at least one hole card matches a board card rank
+  const holeRanks = holeCards.map(c => c.rank);
+  const newCardRanks = board.slice(prevBoard.length).map(c => c.rank);
 
-  // 前ストリートまでペアなし → 今ストリートでワンペア成立（のみ）
-  const wasNoPair = prevHandRank < HandRank.ONE_PAIR;
-  const isExactlyOnePair = newHandRank === HandRank.ONE_PAIR;
+  // The new board cards must match at least one hole card
+  const holeCardHitsBoard = newCardRanks.some(boardRank =>
+    holeRanks.includes(boardRank)
+  );
 
-  return wasNoPair && isExactlyOnePair;
+  if (!holeCardHitsBoard) return false;
+
+  // Must not have had a pair before
+  const prevHadPairWithHole = prevBoard.some(bc => holeRanks.includes(bc.rank));
+  const pocketPair = holeCards[0].rank === holeCards[1].rank;
+  if (prevHadPairWithHole || pocketPair) return false;
+
+  // After this street, check the hand rank is exactly ONE_PAIR
+  // and that the pair involves a hole card
+  const allCards = [...holeCards, ...board];
+  const handRank = getBestHandRank(allCards);
+
+  // Only ONE_PAIR qualifies (not two pair, trips, etc.)
+  if (handRank !== HandRank.ONE_PAIR) return false;
+
+  // Verify the pair actually involves a hole card (not just board pair)
+  const boardRanks = board.map(c => c.rank);
+  const matchingHoleCard = holeRanks.some(hr => boardRanks.includes(hr));
+
+  return matchingHoleCard;
 }
 
 /**

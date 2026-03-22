@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useGameState } from '../../hooks/useGameState';
 import PlayerSeat from './PlayerSeat';
 import BoardCards from './BoardCards';
@@ -21,7 +21,7 @@ const SEAT_POSITIONS: { top: string; left: string }[] = [
 ];
 
 export default function PokerTable() {
-  const { gameState, myPlayer, myHoleCards, isMyTurn, availableActions } = useGameState();
+  const { gameState, myPlayer, myHoleCards, isMyTurn, availableActions, lastResult } = useGameState();
   const playerId = useGameStore((s) => s.playerId);
   const isPracticeMode = useGameStore((s) => s.isPracticeMode);
   const { sendAction: sendSocketAction } = useSocket();
@@ -34,6 +34,17 @@ export default function PokerTable() {
     if (!playerId || !canFold) return;
     sendAction({ playerId, type: 'fold' });
   }, [playerId, canFold, sendAction]);
+
+  // result時のチップ増減マップを計算
+  const chipDeltas = useMemo(() => {
+    const deltas = new Map<string, number>();
+    if (lastResult && gameState?.phase === 'result') {
+      for (const w of lastResult.winners) {
+        deltas.set(w.playerId, w.amount);
+      }
+    }
+    return deltas;
+  }, [lastResult, gameState?.phase]);
 
   if (!gameState) {
     return (
@@ -48,8 +59,7 @@ export default function PokerTable() {
   // 自分の席を下に配置するようにシートを回転
   const selfSeatIndex = myPlayer?.seatIndex ?? 0;
   const rotateSeats = (originalIndex: number) => {
-    // 自分を常に下（Seat 2 or 3の位置）に見せる
-    const offset = selfSeatIndex - 3; // Seat 3を自分の位置にする
+    const offset = selfSeatIndex - 3;
     const rotated = (originalIndex - offset + 6) % 6;
     return SEAT_POSITIONS[rotated];
   };
@@ -82,6 +92,7 @@ export default function PokerTable() {
           isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === player.id}
           isSelf={player.id === playerId}
           position={rotateSeats(player.seatIndex)}
+          chipDelta={chipDeltas.get(player.id)}
         />
       ))}
 

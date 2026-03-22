@@ -109,47 +109,23 @@ export default function RoomPage() {
       {/* Chat (online only) */}
       {!isPracticeMode && <ChatPanel />}
 
-      {/* Result overlay */}
+      {/* Lightweight result banner (no overlay, no blocking) */}
       {lastResult && gameState?.phase === 'result' && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center bg-surface-0/60 backdrop-blur-md">
-          <div className="bg-surface-1 border border-border rounded-xl shadow-xl p-5 max-w-xs w-full animate-fade-in">
-            <h2 className="text-center text-text-primary font-semibold text-base mb-4">Hand Result</h2>
-
-            {/* Winners */}
-            <div className="space-y-2 mb-4">
-              {lastResult.winners.map((w, i) => (
-                <div key={i} className="flex items-center justify-between bg-positive-muted border border-positive/10 rounded-md px-3 py-2">
-                  <span className="text-positive font-medium text-sm">
-                    {gameState.players.find(p => p.id === w.playerId)?.name ?? 'Unknown'}
-                  </span>
-                  <div className="text-right">
-                    <div className="text-text-primary font-mono text-sm font-bold">+{w.amount.toLocaleString()}</div>
-                    <div className="text-text-tertiary text-xs">{w.handName}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Showdown info */}
-            {lastResult.showdown.length > 0 && (
-              <div className="border-t border-border pt-3">
-                <h3 className="text-text-tertiary text-xs uppercase tracking-wider mb-2">Showdown</h3>
-                <div className="space-y-1">
-                  {lastResult.showdown.map((s, i) => (
-                    <div key={i} className="text-xs text-text-secondary">
-                      <span className="text-text-primary">{gameState.players.find(p => p.id === s.playerId)?.name}</span>
-                      {' \u2014 '}
-                      <span className="text-text-tertiary">{s.handName}</span>
-                      {s.mustShow && <span className="text-danger ml-1">(HIT SHOW)</span>}
-                    </div>
-                  ))}
-                </div>
+        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-30 animate-slide-up">
+          <div className="bg-surface-1/95 backdrop-blur-sm border border-border rounded-lg shadow-lg px-4 py-2.5 flex items-center gap-3">
+            {lastResult.winners.map((w, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <span className="text-text-primary font-medium">
+                  {gameState.players.find(p => p.id === w.playerId)?.name ?? '?'}
+                </span>
+                <span className="text-positive font-mono font-bold">
+                  +{w.amount.toLocaleString()}
+                </span>
+                <span className="text-text-tertiary text-xs">
+                  {w.handName}
+                </span>
               </div>
-            )}
-
-            <div className="text-center text-text-tertiary text-xs mt-4">
-              Next hand starting soon...
-            </div>
+            ))}
           </div>
         </div>
       )}

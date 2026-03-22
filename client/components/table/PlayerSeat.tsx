@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { ClientPlayerState } from '../../../shared/types/player';
 import CardComponent from '../ui/Card';
 import HitBadge from '../ui/HitBadge';
@@ -10,6 +11,7 @@ interface PlayerSeatProps {
   isCurrentTurn: boolean;
   isSelf: boolean;
   position: { top: string; left: string };
+  chipDelta?: number; // +1200 or -400 etc
 }
 
 const ACTION_LABELS: Record<string, { text: string; color: string }> = {
@@ -21,7 +23,20 @@ const ACTION_LABELS: Record<string, { text: string; color: string }> = {
   'all-in': { text: 'ALL-IN', color: 'text-danger' },
 };
 
-export default function PlayerSeat({ player, isCurrentTurn, isSelf, position }: PlayerSeatProps) {
+export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, chipDelta }: PlayerSeatProps) {
+  const [showDelta, setShowDelta] = useState(false);
+  const [displayedDelta, setDisplayedDelta] = useState(0);
+
+  // チップ増減アニメーション
+  useEffect(() => {
+    if (chipDelta !== undefined && chipDelta !== 0) {
+      setDisplayedDelta(chipDelta);
+      setShowDelta(true);
+      const timer = setTimeout(() => setShowDelta(false), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [chipDelta]);
+
   const turnRing = isCurrentTurn
     ? 'ring-2 ring-primary animate-turn-pulse'
     : '';
@@ -34,7 +49,21 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position }: 
       className={`absolute transform -translate-x-1/2 -translate-y-1/2 z-10`}
       style={{ top: position.top, left: position.left }}
     >
-      <div className={`flex flex-col items-center gap-1 ${foldedOpacity}`}>
+      <div className={`flex flex-col items-center gap-1 ${foldedOpacity} relative`}>
+        {/* Chip delta float */}
+        {showDelta && displayedDelta !== 0 && (
+          <div
+            className={`absolute -top-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none
+              font-mono text-sm font-bold whitespace-nowrap
+              ${displayedDelta > 0 ? 'text-positive' : 'text-danger'}`}
+            style={{
+              animation: 'chip-float 2.5s var(--ease-out) forwards',
+            }}
+          >
+            {displayedDelta > 0 ? '+' : ''}{displayedDelta.toLocaleString()}
+          </div>
+        )}
+
         {/* Hole cards above seat */}
         {!isSelf && player.holeCards.length > 0 && (
           <div className="flex gap-0.5 mb-1">
