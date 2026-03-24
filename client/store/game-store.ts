@@ -6,6 +6,9 @@ import { ClientGameState, ActionType, GamePhase } from '../../shared/types/game'
 import { ClientPlayerState } from '../../shared/types/player';
 import { ChatMessage, HandResult } from '../../shared/types/socket';
 
+// ショーダウンで公開されたカード（playerId -> Card[]）
+export type ShowdownCards = Map<string, Card[]>;
+
 interface GameStore {
   gameState: ClientGameState | null;
   myHoleCards: Card[];
@@ -15,6 +18,7 @@ interface GameStore {
   playerName: string | null;
   chatMessages: ChatMessage[];
   lastResult: HandResult | null;
+  showdownCards: ShowdownCards;
   isPracticeMode: boolean;
 
   // ベットUI状態
@@ -31,6 +35,7 @@ interface GameStore {
   setRoomInfo: (roomId: string, playerId: string, name: string) => void;
   addChatMessage: (msg: ChatMessage) => void;
   setLastResult: (result: HandResult | null) => void;
+  setShowdownCards: (cards: ShowdownCards) => void;
   setIsPracticeMode: (mode: boolean) => void;
   reset: () => void;
 }
@@ -44,6 +49,7 @@ export const useGameStore = create<GameStore>((set) => ({
   playerName: null,
   chatMessages: [],
   lastResult: null,
+  showdownCards: new Map(),
   isPracticeMode: false,
   betMode: false,
   betAmount: 0,
@@ -62,6 +68,7 @@ export const useGameStore = create<GameStore>((set) => ({
     chatMessages: [...s.chatMessages.slice(-99), msg],
   })),
   setLastResult: (result) => set({ lastResult: result }),
+  setShowdownCards: (cards) => set({ showdownCards: cards }),
   setIsPracticeMode: (mode) => set({ isPracticeMode: mode }),
   reset: () => set({
     gameState: null,
@@ -72,6 +79,7 @@ export const useGameStore = create<GameStore>((set) => ({
     playerName: null,
     chatMessages: [],
     lastResult: null,
+    showdownCards: new Map(),
     isPracticeMode: false,
     betMode: false,
     betAmount: 0,

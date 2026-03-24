@@ -12,6 +12,7 @@ export function useLocalGame() {
   const setGameState = useGameStore((s) => s.setGameState);
   const setMyHoleCards = useGameStore((s) => s.setMyHoleCards);
   const setLastResult = useGameStore((s) => s.setLastResult);
+  const setShowdownCards = useGameStore((s) => s.setShowdownCards);
   const setRoomInfo = useGameStore((s) => s.setRoomInfo);
   const setIsPracticeMode = useGameStore((s) => s.setIsPracticeMode);
   const reset = useGameStore((s) => s.reset);
@@ -30,8 +31,12 @@ export function useLocalGame() {
       onHandResult: (result) => {
         setLastResult(result);
       },
+      onShowdown: (cards) => {
+        setShowdownCards(cards);
+      },
       onNextHand: () => {
         setLastResult(null);
+        setShowdownCards(new Map());
       },
     });
 
@@ -41,7 +46,7 @@ export function useLocalGame() {
 
     // ゲーム開始
     manager.startGame();
-  }, [setGameState, setMyHoleCards, setLastResult, setRoomInfo, setIsPracticeMode]);
+  }, [setGameState, setMyHoleCards, setLastResult, setShowdownCards, setRoomInfo, setIsPracticeMode]);
 
   const sendAction = useCallback((action: GameAction) => {
     if (globalManager) {

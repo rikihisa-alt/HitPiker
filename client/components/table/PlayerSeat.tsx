@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { ClientPlayerState } from '../../../shared/types/player';
+import { Card } from '../../../shared/types/card';
 import CardComponent from '../ui/Card';
 import HitBadge from '../ui/HitBadge';
 import ShowLockBadge from '../ui/ShowLockBadge';
+import { useGameStore } from '../../store/game-store';
 
 interface PlayerSeatProps {
   player: ClientPlayerState;
@@ -26,6 +28,8 @@ const ACTION_LABELS: Record<string, { text: string; color: string }> = {
 export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, chipDelta }: PlayerSeatProps) {
   const [showDelta, setShowDelta] = useState(false);
   const [displayedDelta, setDisplayedDelta] = useState(0);
+  const [revealedCards, setRevealedCards] = useState<Card[] | null>(null);
+  const showdownCards = useGameStore((s) => s.showdownCards);
 
   // チップ増減アニメーション
   useEffect(() => {
@@ -37,7 +41,24 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
     }
   }, [chipDelta]);
 
+  // ショーダウンカード公開アニメーション
+  useEffect(() => {
+    const cards = showdownCards.get(player.id);
+    if (cards && cards.length > 0 && !isSelf) {
+      // 少し遅延させてフリップ感を出す
+      const timer = setTimeout(() => {
+        setRevealedCards(cards);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else if (!cards || cards.length === 0) {
+      setRevealedCards(null);
+    }
+  }, [showdownCards, player.id, isSelf]);
+
   const isActive = !player.folded && !player.disconnected;
+
+  // 表示するカード: ショーダウンで公開されたカード or 通常の隠しカード
+  const displayCards = revealedCards || ((!isSelf && player.holeCards.length > 0) ? player.holeCards : null);
 
   return (
     <div
@@ -56,11 +77,17 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
       )}
 
       <div className="flex flex-col items-center gap-1 relative">
-        {/* Hole cards above seat (other players, shown at showdown) */}
-        {!isSelf && player.holeCards.length > 0 && (
+        {/* Hole cards above seat (other players) */}
+        {!isSelf && displayCards && displayCards.length > 0 && (
           <div className="flex gap-0.5 mb-0.5">
-            {player.holeCards.map((card, i) => (
-              <CardComponent key={i} card={card} size="sm" />
+            {displayCards.map((card, i) => (
+              <div
+                key={i}
+                className={revealedCards ? 'animate-card-flip' : ''}
+                style={revealedCards ? { animationDelay: `${i * 150}ms` } : undefined}
+              >
+                <CardComponent card={card} size="sm" />
+              </div>
             ))}
           </div>
         )}

@@ -19,6 +19,7 @@ import { decideCOMAction, getComActionDelay, getComName } from './com-ai';
 export type LocalGameCallback = {
   onGameStateUpdate: (state: ClientGameState, myCards: Card[]) => void;
   onHandResult: (result: HandResult) => void;
+  onShowdown: (showdownCards: Map<string, Card[]>) => void;
   onNextHand: () => void;
 };
 
@@ -260,6 +261,20 @@ export class LocalGameManager {
 
   // ハンド終了処理
   private handleHandComplete(result: HandResult): void {
+    // ショーダウンカードを公開
+    if (this.gameState) {
+      const showdownCards = new Map<string, Card[]>();
+      for (const info of result.showdown) {
+        showdownCards.set(info.playerId, info.holeCards);
+      }
+      // フォールドしていないプレイヤーのカードも公開
+      for (const p of this.gameState.players) {
+        if (!p.folded && p.holeCards.length > 0 && !showdownCards.has(p.id)) {
+          showdownCards.set(p.id, p.holeCards);
+        }
+      }
+      this.callbacks.onShowdown(showdownCards);
+    }
     this.callbacks.onHandResult(result);
 
     // 結果表示後に次のハンドへ

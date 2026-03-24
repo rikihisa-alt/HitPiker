@@ -82,11 +82,11 @@ export default function PokerTable() {
         {/* Subtle felt texture line */}
         <div className="absolute inset-5 rounded-[50%] border border-felt-line" />
 
-        {/* Center: pot + board */}
+        {/* Center: board + pot (side by side) */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-          flex flex-col items-center gap-2">
-          <PotDisplay pot={gameState.pot} />
+          flex items-center gap-3">
           <BoardCards cards={gameState.board} />
+          <PotDisplay pot={gameState.pot} />
         </div>
       </div>
 

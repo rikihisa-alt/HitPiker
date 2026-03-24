@@ -63,12 +63,18 @@ module.exports = {
           '0%': { opacity: '1', transform: 'translateY(0)' },
           '100%': { opacity: '0', transform: 'translateY(-24px)' },
         },
+        'card-flip': {
+          '0%': { transform: 'rotateY(180deg) scale(0.8)', opacity: '0' },
+          '50%': { transform: 'rotateY(90deg) scale(0.9)', opacity: '0.5' },
+          '100%': { transform: 'rotateY(0deg) scale(1)', opacity: '1' },
+        },
       },
       animation: {
         'turn-glow': 'turn-glow 2s ease-in-out infinite',
         'fade-in': 'fade-in 0.2s ease-out',
         'slide-up': 'slide-up 0.25s ease-out',
         'chip-float': 'chip-float 1.5s ease-out forwards',
+        'card-flip': 'card-flip 0.4s ease-out both',
       },
     },
   },
