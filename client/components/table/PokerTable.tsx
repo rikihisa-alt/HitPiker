@@ -28,6 +28,7 @@ export default function PokerTable() {
   const { sendAction: sendLocalAction } = useLocalGame();
   const sendAction = isPracticeMode ? sendLocalAction : sendSocketAction;
 
+  const betMode = useGameStore((s) => s.betMode);
   const canFold = isMyTurn && availableActions.includes('fold');
 
   const handleDragFold = useCallback(() => {
@@ -96,8 +97,9 @@ export default function PokerTable() {
         />
       ))}
 
-      {/* Hole cards (bottom center) */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20">
+      {/* Hole cards (bottom center, pushed up when action panel visible) */}
+      <div className={`absolute left-1/2 transform -translate-x-1/2 z-20 transition-all duration-200
+        ${isMyTurn && betMode ? 'bottom-[220px]' : isMyTurn ? 'bottom-[88px]' : 'bottom-4'}`}>
         <HoleCards cards={myHoleCards} player={myPlayer} canFold={canFold} onFold={handleDragFold} />
       </div>
 
