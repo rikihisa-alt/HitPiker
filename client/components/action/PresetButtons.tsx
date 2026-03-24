@@ -17,9 +17,9 @@ export default function PresetButtons({ isPreflop, onBBPreset, onPotPreset, onAl
           <button
             key={preset.label}
             onClick={() => onBBPreset(preset.multiplier)}
-            className="text-xs font-medium px-3 py-1.5 rounded-full
-              bg-surface-3 text-text-secondary border border-border
-              hover:border-border-strong hover:text-text-primary
+            className="px-2.5 py-1 text-[11px] chip-amt font-medium rounded-full
+              bg-surface-2 border border-border text-text-sub
+              hover:bg-surface-raised hover:text-text
               transition-colors active:scale-95"
           >
             {preset.label}
@@ -41,11 +41,11 @@ export default function PresetButtons({ isPreflop, onBBPreset, onPotPreset, onAl
               onPotPreset(preset.ratio!);
             }
           }}
-          className={`text-xs font-medium px-3 py-1.5 rounded-full
+          className={`px-2.5 py-1 text-[11px] chip-amt font-medium rounded-full
             border transition-colors active:scale-95
             ${preset.type === 'allin'
-              ? 'bg-surface-3 text-danger border-danger/30 hover:border-danger/50 hover:text-danger'
-              : 'bg-surface-3 text-text-secondary border-border hover:border-border-strong hover:text-text-primary'
+              ? 'bg-surface-2 text-danger border-danger/20 hover:bg-surface-raised hover:text-danger'
+              : 'bg-surface-2 text-text-sub border-border hover:bg-surface-raised hover:text-text'
             }`}
         >
           {preset.label}

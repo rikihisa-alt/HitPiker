@@ -6,10 +6,8 @@ interface HitBadgeProps {
 }
 
 export default function HitBadge({ hitSource, size = 'md' }: HitBadgeProps) {
-  const sizeClass = size === 'sm' ? 'text-[10px] px-2 py-0.5' : 'text-xs px-2.5 py-1';
-
   return (
-    <span className={`${sizeClass} font-semibold tracking-wide rounded-full bg-danger text-white`}>
+    <span className="text-[9px] font-bold text-danger bg-danger-soft border border-danger/20 rounded-pill px-1.5 py-0.5 uppercase tracking-wider">
       HIT
     </span>
   );

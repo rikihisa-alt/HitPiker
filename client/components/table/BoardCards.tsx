@@ -8,20 +8,18 @@ interface BoardCardsProps {
 }
 
 export default function BoardCards({ cards }: BoardCardsProps) {
-  if (cards.length === 0) return null;
-
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-1.5">
       {cards.map((card, i) => (
         <div key={`${card.suit}-${card.rank}-${i}`} className="animate-fade-in">
           <CardComponent card={card} size="md" />
         </div>
       ))}
-      {/* Empty slots */}
+      {/* Empty slots - subtle outline placeholders */}
       {Array.from({ length: 5 - cards.length }).map((_, i) => (
         <div
           key={`empty-${i}`}
-          className="w-12 h-[68px] rounded-md bg-surface-3/30"
+          className="w-11 h-[62px] rounded-md border border-felt-line bg-transparent"
         />
       ))}
     </div>

@@ -60,7 +60,7 @@ export default function BetSlider({ min, max, value, onChange }: BetSliderProps)
         onTouchStart={handleTouchStart}
       >
         {/* Track background */}
-        <div className="absolute w-full h-1.5 rounded-full bg-surface-3">
+        <div className="absolute w-full h-1 rounded-full bg-surface-raised">
           {/* Active fill */}
           <div
             className="h-full rounded-full bg-caution"
@@ -70,7 +70,7 @@ export default function BetSlider({ min, max, value, onChange }: BetSliderProps)
 
         {/* Thumb */}
         <div
-          className="absolute w-5 h-5 rounded-full bg-white border-2 border-caution
+          className="absolute w-5 h-5 rounded-full bg-caution border-2 border-caution-fg
             shadow-md transform -translate-x-1/2
             hover:scale-110 transition-transform"
           style={{ left: `${percentage}%` }}
@@ -78,7 +78,7 @@ export default function BetSlider({ min, max, value, onChange }: BetSliderProps)
       </div>
 
       {/* Min / Max labels */}
-      <div className="flex justify-between text-xs text-text-tertiary font-mono mt-0.5">
+      <div className="flex justify-between text-[10px] chip-amt text-text-muted mt-0.5">
         <span>{min.toLocaleString()}</span>
         <span>All-in ({max.toLocaleString()})</span>
       </div>

@@ -28,9 +28,9 @@ const RANK_LABELS: Record<Rank, string> = {
 };
 
 const SIZE_CLASSES = {
-  sm: 'w-9 h-[52px] text-[10px]',
-  md: 'w-12 h-[68px] text-xs',
-  lg: 'w-16 h-[92px] text-base',
+  sm: 'w-8 h-11 text-[10px]',
+  md: 'w-11 h-[60px] text-xs',
+  lg: 'w-14 h-[80px] text-sm',
 };
 
 export default function CardComponent({ card, size = 'md', faceDown }: CardProps) {
@@ -38,8 +38,8 @@ export default function CardComponent({ card, size = 'md', faceDown }: CardProps
 
   if (faceDown || !isVisibleCard(card)) {
     return (
-      <div className={`${sizeClass} rounded-md bg-surface-2 border border-border-strong shadow-sm flex items-center justify-center select-none`}>
-        <span className="text-text-tertiary font-semibold text-[9px] tracking-wider">HP</span>
+      <div className={`${sizeClass} bg-surface-raised border border-border rounded-md shadow-card flex items-center justify-center select-none`}>
+        <span className="text-text-muted text-[8px] font-semibold tracking-wider">HP</span>
       </div>
     );
   }
@@ -50,15 +50,8 @@ export default function CardComponent({ card, size = 'md', faceDown }: CardProps
   const label = RANK_LABELS[rank];
 
   return (
-    <div className={`${sizeClass} rounded-md bg-white border border-gray-200 shadow-sm flex flex-col justify-between p-1 select-none cursor-default`}>
+    <div className={`${sizeClass} bg-white rounded-md shadow-card flex flex-col p-1 select-none cursor-default`}>
       <div className={`${colorClass} font-bold leading-none`}>
-        <div>{label}</div>
-        <div className="text-[0.65em]">{symbol}</div>
-      </div>
-      <div className={`${colorClass} text-center text-[1.5em] leading-none`}>
-        {symbol}
-      </div>
-      <div className={`${colorClass} font-bold leading-none self-end rotate-180`}>
         <div>{label}</div>
         <div className="text-[0.65em]">{symbol}</div>
       </div>

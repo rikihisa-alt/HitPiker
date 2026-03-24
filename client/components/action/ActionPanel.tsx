@@ -54,12 +54,12 @@ export default function ActionPanel() {
   const canBetOrRaise = canBet || canRaise;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm mx-4 animate-slide-up">
-      <div className="bg-surface-1 border border-border rounded-xl shadow-xl p-3">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-slide-up">
+      <div className="bg-surface-1/95 backdrop-blur-md border border-border rounded-lg shadow-lg p-3">
 
-        {/* Bet/Raise area */}
+        {/* Bet/Raise controls */}
         {betMode && (
-          <div className="mb-3 space-y-2.5 border-b border-border pb-3">
+          <div className="mb-3 pb-3 border-b border-border-subtle space-y-2">
             <PresetButtons
               isPreflop={isPreflop}
               onBBPreset={bbPreset}
@@ -73,23 +73,18 @@ export default function ActionPanel() {
               onChange={setBetAmount}
             />
             <div className="flex justify-center">
-              <BetInput
-                value={betAmount}
-                min={minBet}
-                max={maxBet}
-                onChange={setBetAmount}
-              />
+              <BetInput value={betAmount} min={minBet} max={maxBet} onChange={setBetAmount} />
             </div>
           </div>
         )}
 
-        {/* Main action buttons */}
+        {/* Action buttons */}
         <div className="flex gap-2">
           {/* FOLD */}
           {canFold && (
             <button
               onClick={() => handleAction('fold')}
-              className="btn btn-ghost flex-1 text-sm py-3 rounded-md active:scale-[0.97]"
+              className="btn btn-danger flex-1 py-2.5 text-sm rounded-md active:scale-[0.97]"
             >
               FOLD
             </button>
@@ -99,7 +94,7 @@ export default function ActionPanel() {
           {canCheck && (
             <button
               onClick={() => handleAction('check')}
-              className="btn btn-positive flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
+              className="btn btn-positive flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]"
             >
               CHECK
             </button>
@@ -109,11 +104,11 @@ export default function ActionPanel() {
           {canCall && (
             <button
               onClick={() => handleAction('call')}
-              className="btn btn-primary flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
+              className="btn btn-primary flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]"
             >
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center leading-tight">
                 <span>CALL</span>
-                <span className="text-[11px] font-mono opacity-80">
+                <span className="text-[10px] chip-amt opacity-70">
                   {callAmount.toLocaleString()}
                 </span>
               </div>
@@ -125,11 +120,11 @@ export default function ActionPanel() {
             betMode ? (
               <button
                 onClick={() => handleAction(canBet ? 'bet' : 'raise', betAmount)}
-                className="btn btn-caution flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
+                className="btn btn-caution flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]"
               >
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center leading-tight">
                   <span>{canBet ? 'BET' : 'RAISE'}</span>
-                  <span className="text-[11px] font-mono opacity-80">
+                  <span className="text-[10px] chip-amt opacity-70">
                     {betAmount.toLocaleString()}
                   </span>
                 </div>
@@ -137,7 +132,7 @@ export default function ActionPanel() {
             ) : (
               <button
                 onClick={openBetMode}
-                className="btn btn-caution flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
+                className="btn btn-caution flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]"
               >
                 {canBet ? 'BET' : 'RAISE'}
               </button>
@@ -148,7 +143,7 @@ export default function ActionPanel() {
           {canAllIn && !canBetOrRaise && (
             <button
               onClick={() => handleAction('all-in')}
-              className="btn btn-danger flex-1 text-sm font-semibold py-3 rounded-md active:scale-[0.97]"
+              className="btn flex-[1.3] py-2.5 text-sm font-bold rounded-md bg-danger text-danger-fg active:scale-[0.97]"
             >
               ALL-IN
             </button>

@@ -87,7 +87,7 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className={`flex items-center gap-4 bg-surface-1 backdrop-blur-sm rounded-xl px-6 py-3 border
+        className={`flex items-center gap-3 bg-surface-1 backdrop-blur-sm rounded-lg px-4 py-2 border
           ${canFold ? 'cursor-grab active:cursor-grabbing' : ''}
           ${isDragging ? 'border-danger/40' : 'border-border'}
           ${isFolding ? 'transition-all duration-300' : isDragging ? '' : 'transition-all duration-200'}`}
@@ -96,13 +96,13 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
           opacity,
         }}
       >
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           {cards.map((card, i) => (
             <CardComponent key={`hole-${i}`} card={card} size="lg" />
           ))}
         </div>
-        {player && (
-          <div className="flex flex-col gap-1">
+        {player && (player.hit.hitRevealed || (player.hit.mustShowIfNotFolded && !player.folded)) && (
+          <div className="flex items-center gap-1">
             {player.hit.hitRevealed && (
               <HitBadge hitSource={player.hit.hitSource} />
             )}
@@ -115,7 +115,7 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
 
       {/* Drag hint */}
       {canFold && !isDragging && !isFolding && (
-        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-text-tertiary whitespace-nowrap animate-pulse">
+        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-text-muted whitespace-nowrap opacity-60">
           drag to fold
         </div>
       )}
@@ -126,10 +126,10 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
           style={{ opacity: progress }}
         >
-          <div className={`px-4 py-1.5 rounded-full text-sm font-semibold border
+          <div className={`px-3 py-1 rounded-pill text-xs font-semibold border
             ${progress >= 1
-              ? 'bg-danger text-white border-danger'
-              : 'bg-danger-muted text-danger border-danger/30'
+              ? 'bg-danger text-danger-fg border-danger'
+              : 'bg-danger-soft text-danger border-danger/30'
             }`}
           >
             {progress >= 1 ? 'Release to FOLD' : 'FOLD'}

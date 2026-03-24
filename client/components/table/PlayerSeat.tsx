@@ -11,16 +11,16 @@ interface PlayerSeatProps {
   isCurrentTurn: boolean;
   isSelf: boolean;
   position: { top: string; left: string };
-  chipDelta?: number; // +1200 or -400 etc
+  chipDelta?: number;
 }
 
 const ACTION_LABELS: Record<string, { text: string; color: string }> = {
-  fold: { text: 'FOLD', color: 'text-text-tertiary' },
+  fold: { text: 'FOLD', color: 'text-text-muted' },
   check: { text: 'CHECK', color: 'text-positive' },
   call: { text: 'CALL', color: 'text-primary' },
   bet: { text: 'BET', color: 'text-caution' },
   raise: { text: 'RAISE', color: 'text-caution' },
-  'all-in': { text: 'ALL-IN', color: 'text-danger' },
+  'all-in': { text: 'ALL IN', color: 'text-danger' },
 };
 
 export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, chipDelta }: PlayerSeatProps) {
@@ -37,104 +37,100 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
     }
   }, [chipDelta]);
 
-  const turnRing = isCurrentTurn
-    ? 'ring-2 ring-primary animate-turn-pulse'
-    : '';
-
-  const foldedOpacity = player.folded ? 'opacity-40' : '';
-  const disconnectedBorder = player.disconnected ? 'border-danger/40' : 'border-border';
+  const isActive = !player.folded && !player.disconnected;
 
   return (
     <div
-      className={`absolute transform -translate-x-1/2 -translate-y-1/2 z-10`}
+      className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
       style={{ top: position.top, left: position.left }}
     >
-      <div className={`flex flex-col items-center gap-1 ${foldedOpacity} relative`}>
-        {/* Chip delta float */}
-        {showDelta && displayedDelta !== 0 && (
-          <div
-            className={`absolute -top-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none
-              font-mono text-sm font-bold whitespace-nowrap
-              ${displayedDelta > 0 ? 'text-positive' : 'text-danger'}`}
-            style={{
-              animation: 'chip-float 2.5s var(--ease-out) forwards',
-            }}
-          >
-            {displayedDelta > 0 ? '+' : ''}{displayedDelta.toLocaleString()}
-          </div>
-        )}
+      {/* Chip delta float */}
+      {showDelta && displayedDelta !== 0 && (
+        <div
+          className={`absolute -top-7 left-1/2 -translate-x-1/2 z-20 pointer-events-none
+            chip-amt text-sm font-bold whitespace-nowrap animate-chip-float
+            ${displayedDelta > 0 ? 'text-positive' : 'text-danger'}`}
+        >
+          {displayedDelta > 0 ? '+' : ''}{displayedDelta.toLocaleString()}
+        </div>
+      )}
 
-        {/* Hole cards above seat */}
+      <div className="flex flex-col items-center gap-1 relative">
+        {/* Hole cards above seat (other players, shown at showdown) */}
         {!isSelf && player.holeCards.length > 0 && (
-          <div className="flex gap-0.5 mb-1">
+          <div className="flex gap-0.5 mb-0.5">
             {player.holeCards.map((card, i) => (
               <CardComponent key={i} card={card} size="sm" />
             ))}
           </div>
         )}
 
-        {/* Player info box */}
-        <div className={`rounded-lg border ${disconnectedBorder} ${turnRing}
-          bg-surface-1 shadow-sm
-          px-3 py-2 min-w-[100px] text-center`}>
+        {/* Main capsule */}
+        <div className={`relative flex items-center gap-2 px-3 py-1.5 rounded-pill
+          bg-surface-1/90 backdrop-blur-sm border transition-all duration-200
+          ${isCurrentTurn ? 'border-primary animate-turn-glow' : 'border-border'}
+          ${player.folded ? 'opacity-40 grayscale' : ''}
+          ${player.disconnected ? 'opacity-30' : ''}
+          ${isSelf && !player.folded ? 'border-primary/30' : ''}`}
+        >
+          {/* Position badge (D/SB/BB) */}
+          {(player.isDealer || player.isSB || player.isBB) && (
+            <span className="absolute -top-2 -right-1 text-[9px] font-bold px-1.5 py-0 rounded-pill
+              bg-surface-raised border border-border text-text-sub">
+              {player.isDealer ? 'D' : player.isSB ? 'SB' : 'BB'}
+            </span>
+          )}
 
-          {/* Position badges */}
-          <div className="flex justify-center gap-1 mb-1">
-            {player.isDealer && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-surface-3 text-text-secondary font-semibold">D</span>
-            )}
-            {player.isSB && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary-muted text-primary font-semibold">SB</span>
-            )}
-            {player.isBB && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-positive-muted text-positive font-semibold">BB</span>
-            )}
-          </div>
+          {/* HIT indicator dot */}
+          {player.hit.hitRevealed && (
+            <span className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-danger border-2 border-surface-1" />
+          )}
 
-          {/* Name */}
-          <div className="text-sm font-medium text-text-primary truncate max-w-[90px]">
-            {player.name}
-          </div>
-
-          {/* Stack */}
-          <div className="font-mono text-xs text-text-secondary">
-            {player.stack.toLocaleString()}
-          </div>
-
-          {/* Last action */}
-          {player.lastAction && (
-            <div className="mt-1">
-              <span className={`text-[10px] font-semibold
-                ${ACTION_LABELS[player.lastAction]?.color ?? 'text-text-tertiary'}`}>
-                {ACTION_LABELS[player.lastAction]?.text ?? player.lastAction.toUpperCase()}
+          {/* Info */}
+          <div className="flex flex-col items-center min-w-[60px]">
+            <span className="text-[11px] text-text-sub truncate max-w-[80px]">
+              {player.name}
+            </span>
+            <span className="chip-amt text-xs font-semibold text-text">
+              {player.stack.toLocaleString()}
+            </span>
+            {/* Current bet inline */}
+            {player.currentBet > 0 && !player.folded && (
+              <span className="chip-amt text-[10px] text-caution font-medium">
+                bet {player.currentBet.toLocaleString()}
               </span>
-            </div>
-          )}
-
-          {/* Disconnected indicator */}
-          {player.disconnected && (
-            <div className="mt-1 text-[10px] text-danger font-semibold">
-              DISCONNECTED
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* Current bet */}
-        {player.currentBet > 0 && (
-          <div className="mt-1 bg-surface-2 rounded-full px-2 py-0.5 text-text-secondary text-xs font-mono border border-border-subtle">
-            {player.currentBet.toLocaleString()}
+        {/* Action label below capsule */}
+        {player.lastAction && isActive && (
+          <div className="whitespace-nowrap">
+            <span className={`text-[10px] font-semibold uppercase tracking-wide
+              ${ACTION_LABELS[player.lastAction]?.color ?? 'text-text-sub'}`}>
+              {ACTION_LABELS[player.lastAction]?.text ?? player.lastAction.toUpperCase()}
+            </span>
+          </div>
+        )}
+
+        {/* Disconnected label */}
+        {player.disconnected && (
+          <div className="whitespace-nowrap">
+            <span className="text-[10px] text-danger font-semibold">DISCONNECTED</span>
           </div>
         )}
 
         {/* HIT / SHOW badges */}
-        <div className="flex gap-1 mt-1">
-          {player.hit.hitRevealed && (
-            <HitBadge hitSource={player.hit.hitSource} size="sm" />
-          )}
-          {player.hit.mustShowIfNotFolded && !player.folded && (
-            <ShowLockBadge size="sm" />
-          )}
-        </div>
+        {(player.hit.hitRevealed || (player.hit.mustShowIfNotFolded && !player.folded)) && (
+          <div className="flex gap-1">
+            {player.hit.hitRevealed && (
+              <HitBadge hitSource={player.hit.hitSource} size="sm" />
+            )}
+            {player.hit.mustShowIfNotFolded && !player.folded && (
+              <ShowLockBadge size="sm" />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

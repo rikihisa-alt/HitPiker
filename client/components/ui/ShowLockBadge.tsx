@@ -5,10 +5,8 @@ interface ShowLockBadgeProps {
 }
 
 export default function ShowLockBadge({ size = 'md' }: ShowLockBadgeProps) {
-  const sizeClass = size === 'sm' ? 'text-[10px] px-2 py-0.5' : 'text-xs px-2.5 py-1';
-
   return (
-    <span className={`${sizeClass} font-semibold tracking-wide rounded-full bg-caution-muted text-caution border border-caution/20`}>
+    <span className="text-[9px] font-bold text-caution bg-caution-soft border border-caution/20 rounded-pill px-1.5 py-0.5 uppercase tracking-wider">
       SHOW
     </span>
   );

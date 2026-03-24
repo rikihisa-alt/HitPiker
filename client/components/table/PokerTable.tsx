@@ -12,12 +12,12 @@ import { useLocalGame } from '../../hooks/useLocalGame';
 
 // 6人卓の座席位置（楕円配置）
 const SEAT_POSITIONS: { top: string; left: string }[] = [
-  { top: '12%', left: '70%' },   // Seat 0: 右上
-  { top: '50%', left: '92%' },   // Seat 1: 右
-  { top: '88%', left: '70%' },   // Seat 2: 右下
-  { top: '88%', left: '30%' },   // Seat 3: 左下（自分のデフォルト位置付近）
-  { top: '50%', left: '8%' },    // Seat 4: 左
-  { top: '12%', left: '30%' },   // Seat 5: 左上
+  { top: '8%', left: '68%' },    // 0: top-right
+  { top: '44%', left: '90%' },   // 1: right
+  { top: '78%', left: '68%' },   // 2: bottom-right
+  { top: '78%', left: '32%' },   // 3: bottom-left (self default)
+  { top: '44%', left: '10%' },   // 4: left
+  { top: '8%', left: '32%' },    // 5: top-left
 ];
 
 export default function PokerTable() {
@@ -50,7 +50,7 @@ export default function PokerTable() {
   if (!gameState) {
     return (
       <div className="relative w-full h-full flex items-center justify-center">
-        <div className="text-text-secondary text-lg font-medium">
+        <div className="text-text-sub text-lg font-medium">
           Waiting for game to start...
         </div>
       </div>
@@ -67,19 +67,25 @@ export default function PokerTable() {
 
   return (
     <div className="relative w-full h-full">
-      {/* Table surface */}
-      <div className="absolute inset-8 rounded-[50%] bg-gradient-to-b from-felt to-felt-dark
-        border-[8px] border-felt-dark/80
-        shadow-[inset_0_2px_20px_rgba(0,0,0,0.4),0_4px_24px_rgba(0,0,0,0.3)]">
+      {/* Phase pill - top left */}
+      <div className="absolute top-2 left-4 z-10">
+        <span className="chip-amt text-[11px] text-text-muted bg-surface-2 border border-border-subtle rounded-pill px-2.5 py-0.5">
+          {gameState.phase.toUpperCase()} — #{gameState.handNumber}
+        </span>
+      </div>
 
-        {/* Subtle inner vignette */}
-        <div className="absolute inset-0 rounded-[50%] opacity-15 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
+      {/* Felt table */}
+      <div className="absolute inset-4 sm:inset-6 lg:inset-8 rounded-[50%]
+        bg-gradient-to-b from-felt to-felt-deep
+        border-[6px] border-black/20
+        shadow-[inset_0_4px_30px_rgba(0,0,0,0.5),0_0_40px_rgba(0,0,0,0.3)]">
 
-        {/* Inner border line */}
-        <div className="absolute inset-6 rounded-[50%] border border-felt-border" />
+        {/* Subtle felt texture line */}
+        <div className="absolute inset-5 rounded-[50%] border border-felt-line" />
 
-        {/* Board cards + pot */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-3">
+        {/* Center: pot + board */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+          flex flex-col items-center gap-2">
           <PotDisplay pot={gameState.pot} />
           <BoardCards cards={gameState.board} />
         </div>
@@ -98,16 +104,9 @@ export default function PokerTable() {
       ))}
 
       {/* Hole cards (bottom center, pushed up when action panel visible) */}
-      <div className={`absolute left-1/2 transform -translate-x-1/2 z-20 transition-all duration-200
-        ${isMyTurn && betMode ? 'bottom-[220px]' : isMyTurn ? 'bottom-[88px]' : 'bottom-4'}`}>
+      <div className={`absolute left-1/2 -translate-x-1/2 z-20 transition-[bottom] duration-200
+        ${isMyTurn && betMode ? 'bottom-[200px]' : isMyTurn ? 'bottom-[80px]' : 'bottom-3'}`}>
         <HoleCards cards={myHoleCards} player={myPlayer} canFold={canFold} onFold={handleDragFold} />
-      </div>
-
-      {/* Phase indicator */}
-      <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-10">
-        <span className="text-[11px] font-mono text-text-tertiary bg-surface-2/80 backdrop-blur-sm rounded-full px-3 py-1 border border-border-subtle">
-          {gameState.phase.toUpperCase()} — Hand #{gameState.handNumber}
-        </span>
       </div>
     </div>
   );

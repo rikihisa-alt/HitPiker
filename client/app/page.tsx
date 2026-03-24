@@ -86,40 +86,40 @@ export default function LobbyPage() {
   }, [playerName, joinRoomId, joinRoom, router, clearError]);
 
   return (
-    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* ロゴ */}
+        {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
-            <span className="text-primary font-extrabold">HIT</span> Poker
+          <h1 className="text-2xl font-bold text-text tracking-tight">
+            <span className="text-primary font-extrabold">HIT</span> POKER
           </h1>
-          <p className="text-text-tertiary text-sm mt-1">Texas Hold&apos;em with HIT Rules</p>
+          <p className="text-text-sub text-sm mt-1">Texas Hold&apos;em with HIT Rules</p>
         </div>
 
-        {/* 接続状態 */}
+        {/* Connection status */}
         <div className="flex items-center gap-2 mb-6">
           <div
             className={`w-1.5 h-1.5 rounded-full ${
               connected ? 'bg-positive' : 'bg-danger'
             }`}
           />
-          <span className="text-xs text-text-tertiary">
+          <span className="text-xs text-text-sub">
             {connected ? 'Connected' : 'Connecting...'}
           </span>
         </div>
 
-        {/* エラー表示 */}
+        {/* Error */}
         {error && (
-          <div className="mb-4 panel p-3 bg-danger-muted border-danger/30 text-danger text-sm text-center rounded-md">
+          <div className="mb-4 panel p-3 bg-danger-soft border-danger/30 text-danger text-sm text-center">
             {error}
           </div>
         )}
 
-        {/* 練習モード */}
+        {/* Practice section */}
         <div className="panel p-4 mb-6">
-          <h2 className="text-sm font-semibold text-text-primary mb-1">Practice Mode</h2>
-          <p className="text-xs text-text-tertiary mb-3">
-            Play against COM players — no server required
+          <h2 className="text-sm font-semibold text-text mb-1">Practice</h2>
+          <p className="text-xs text-text-sub mb-3">
+            Play against COM players -- no server required
           </p>
           <button
             onClick={() => router.push('/practice')}
@@ -129,16 +129,16 @@ export default function LobbyPage() {
           </button>
         </div>
 
-        {/* セパレータ */}
+        {/* Separator */}
         <div className="flex items-center gap-3 mb-6">
           <div className="flex-1 border-t border-border" />
-          <span className="text-text-tertiary text-xs">or play online</span>
+          <span className="text-text-sub text-xs">Online</span>
           <div className="flex-1 border-t border-border" />
         </div>
 
-        {/* プレイヤー名 */}
+        {/* Player name */}
         <div className="mb-5">
-          <label className="block text-text-secondary text-xs mb-1.5 font-medium">
+          <label className="block text-text-sub text-xs mb-1.5 font-medium">
             Player Name
           </label>
           <input
@@ -151,9 +151,9 @@ export default function LobbyPage() {
           />
         </div>
 
-        {/* ルーム作成 */}
+        {/* Create room */}
         <div className="panel p-4 mb-3">
-          <h2 className="text-sm font-semibold text-text-primary mb-3">Create Room</h2>
+          <h2 className="text-sm font-semibold text-text mb-3">Create Room</h2>
           <input
             type="text"
             value={roomName}
@@ -171,9 +171,9 @@ export default function LobbyPage() {
           </button>
         </div>
 
-        {/* ルーム参加（ID入力） */}
+        {/* Join room */}
         <div className="panel p-4 mb-3">
-          <h2 className="text-sm font-semibold text-text-primary mb-3">Join Room</h2>
+          <h2 className="text-sm font-semibold text-text mb-3">Join Room</h2>
           <div className="flex gap-2">
             <input
               type="text"
@@ -193,20 +193,19 @@ export default function LobbyPage() {
           </div>
         </div>
 
-        {/* ルーム一覧 */}
+        {/* Room list */}
         {rooms.length > 0 && (
           <div className="panel p-4">
-            <h2 className="text-sm font-semibold text-text-primary mb-3">Open Rooms</h2>
-            <div className="space-y-1.5 max-h-48 overflow-y-auto">
+            <h2 className="text-sm font-semibold text-text mb-3">Open Rooms</h2>
+            <div className="max-h-48 overflow-y-auto">
               {rooms.map((room) => (
                 <div
                   key={room.id}
-                  className="flex items-center justify-between p-3 rounded-md bg-surface-2 border border-border
-                    hover:border-border-strong transition-colors duration-fast"
+                  className="flex items-center justify-between py-2.5 border-b border-border-subtle last:border-b-0"
                 >
                   <div className="min-w-0">
-                    <div className="text-sm font-medium text-text-primary truncate">{room.name}</div>
-                    <div className="text-xs text-text-tertiary">
+                    <div className="text-sm font-medium text-text truncate">{room.name}</div>
+                    <div className="text-xs text-text-sub">
                       {room.playerCount}/{room.maxPlayers} players
                       {room.gameInProgress && (
                         <span className="text-caution ml-2">In Progress</span>

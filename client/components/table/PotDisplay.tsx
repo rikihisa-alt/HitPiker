@@ -13,9 +13,10 @@ export default function PotDisplay({ pot }: PotDisplayProps) {
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <div className="bg-surface-2 rounded-full px-4 py-1.5 border border-border">
-        <span className="text-text-primary font-mono text-sm">
-          POT: {total.toLocaleString()}
+      <div className="bg-surface-2/80 backdrop-blur-sm rounded-pill px-3 py-1 border border-border-subtle">
+        <span className="chip-amt text-xs text-text-sub font-semibold tracking-wide">
+          POT{' '}
+          <span className="text-text">{total.toLocaleString()}</span>
         </span>
       </div>
       {pot.sides.length > 0 && (
@@ -23,7 +24,7 @@ export default function PotDisplay({ pot }: PotDisplayProps) {
           {pot.sides.map((side, i) => (
             <span
               key={i}
-              className="text-[10px] bg-surface-2 rounded-full px-2 py-0.5 text-text-secondary font-mono border border-border-subtle"
+              className="chip-amt text-[9px] bg-surface-2/60 rounded-pill px-2 py-0.5 text-text-muted border border-border-subtle"
             >
               Side {i + 1}: {side.amount.toLocaleString()}
             </span>

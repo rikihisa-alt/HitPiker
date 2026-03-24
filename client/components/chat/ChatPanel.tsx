@@ -35,16 +35,13 @@ export default function ChatPanel() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-4 z-40 bg-surface-2 border border-border
-          rounded-full p-2.5 text-text-secondary hover:text-text-primary
-          shadow-md transition-colors relative"
+        className="fixed bottom-6 right-4 z-40 bg-surface-2 border border-border rounded-full p-2 text-text-sub hover:text-text transition-colors relative"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
         {chatMessages.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-danger text-white text-[10px]
-            w-4 h-4 rounded-full flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 bg-danger text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
             {Math.min(chatMessages.length, 9)}
           </span>
         )}
@@ -53,52 +50,49 @@ export default function ChatPanel() {
   }
 
   return (
-    <div className="fixed bottom-6 left-4 z-40 w-72 animate-slide-up">
-      <div className="panel-elevated overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-          <span className="text-text-primary text-sm font-semibold">Chat</span>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="text-text-tertiary hover:text-text-primary text-lg leading-none transition-colors"
-          >
-            &times;
-          </button>
-        </div>
+    <div className="fixed bottom-6 right-4 z-40 w-72 h-80 bg-surface-1 border border-border rounded-lg shadow-lg flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="px-3 py-2 border-b border-border-subtle flex justify-between items-center">
+        <span className="text-text text-sm font-medium">Chat</span>
+        <button
+          onClick={() => setIsOpen(false)}
+          className="text-text-sub hover:text-text text-lg leading-none transition-colors"
+        >
+          &times;
+        </button>
+      </div>
 
-        {/* Messages */}
-        <div ref={scrollRef} className="h-48 overflow-y-auto p-2 space-y-1">
-          {chatMessages.length === 0 ? (
-            <div className="text-text-tertiary text-xs text-center py-4">No messages yet</div>
-          ) : (
-            chatMessages.map((msg, i) => (
-              <div key={i} className="text-xs">
-                <span className="text-primary font-semibold">{msg.playerName}: </span>
-                <span className="text-text-secondary">{msg.text}</span>
-              </div>
-            ))
-          )}
-        </div>
+      {/* Messages */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-1.5 text-sm">
+        {chatMessages.length === 0 ? (
+          <div className="text-text-sub text-xs text-center py-4">No messages yet</div>
+        ) : (
+          chatMessages.map((msg, i) => (
+            <div key={i}>
+              <span className="text-primary text-xs font-medium">{msg.playerName}: </span>
+              <span className="text-text-sub text-sm">{msg.text}</span>
+            </div>
+          ))
+        )}
+      </div>
 
-        {/* Input area */}
-        <div className="flex border-t border-border">
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            maxLength={200}
-            className="flex-1 bg-transparent px-3 py-2 text-sm text-text-primary
-              placeholder-text-tertiary focus:outline-none"
-          />
-          <button
-            onClick={handleSend}
-            className="px-3 py-2 text-primary hover:text-primary-hover text-sm font-medium transition-colors"
-          >
-            Send
-          </button>
-        </div>
+      {/* Input */}
+      <div className="flex border-t border-border-subtle">
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type a message..."
+          maxLength={200}
+          className="input flex-1 border-0 rounded-none text-sm"
+        />
+        <button
+          onClick={handleSend}
+          className="px-3 py-2 text-primary hover:text-primary-hover text-sm font-medium transition-colors"
+        >
+          Send
+        </button>
       </div>
     </div>
   );
