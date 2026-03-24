@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import { Card } from '../../../shared/types/card';
 import CardComponent from '../ui/Card';
 
@@ -8,13 +9,39 @@ interface BoardCardsProps {
 }
 
 export default function BoardCards({ cards }: BoardCardsProps) {
+  // Track the previous card count so we know which cards are "new"
+  const prevCountRef = useRef(0);
+  const revealKeyRef = useRef(0);
+
+  // When card count changes, bump the reveal key to re-trigger animations
+  if (cards.length !== prevCountRef.current) {
+    revealKeyRef.current += 1;
+    prevCountRef.current = cards.length;
+  }
+
+  const revealKey = revealKeyRef.current;
+
   return (
     <div className="flex gap-1.5">
-      {cards.map((card, i) => (
-        <div key={`${card.suit}-${card.rank}-${i}`} className="animate-fade-in">
-          <CardComponent card={card} size="md" />
-        </div>
-      ))}
+      {cards.map((card, i) => {
+        // Flop (indices 0-2): stagger 0ms, 100ms, 200ms
+        // Turn (index 3): 0ms
+        // River (index 4): 0ms
+        let delay = 0;
+        if (i < 3) {
+          delay = i * 100;
+        }
+
+        return (
+          <div
+            key={`${card.suit}-${card.rank}-${i}-${revealKey}`}
+            className="animate-fade-in"
+            style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}
+          >
+            <CardComponent card={card} size="md" />
+          </div>
+        );
+      })}
       {/* Empty slots - subtle outline placeholders */}
       {Array.from({ length: 5 - cards.length }).map((_, i) => (
         <div

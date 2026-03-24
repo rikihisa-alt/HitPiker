@@ -5,6 +5,8 @@ import { Card } from '../../../shared/types/card';
 import CardComponent from '../ui/Card';
 import HitBadge from '../ui/HitBadge';
 import { ClientPlayerState } from '../../../shared/types/player';
+import { useGameStore } from '../../store/game-store';
+import { getHandName } from '../../lib/hand-name';
 
 interface HoleCardsProps {
   cards: Card[];
@@ -63,8 +65,12 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
   };
   const onTouchEnd = () => handleEnd();
 
+  const gameState = useGameStore((s) => s.gameState);
+  const board = gameState?.board ?? [];
+
   if (cards.length === 0) return null;
 
+  const handName = getHandName(cards, board);
   const progress = Math.min(dragY / FOLD_THRESHOLD, 1);
   const opacity = isFolding ? 0 : 1 - progress * 0.6;
   const scale = 1 - progress * 0.15;
@@ -104,6 +110,13 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
           ))}
         </div>
       </div>
+
+      {/* Hand name */}
+      {handName && !isFolding && (
+        <div className="text-center mt-0.5">
+          <span className="text-[10px] text-text-sub chip-amt">{handName}</span>
+        </div>
+      )}
 
       {/* Drag hint */}
       {canFold && !isDragging && !isFolding && (

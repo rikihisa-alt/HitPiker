@@ -72,6 +72,12 @@ module.exports = {
           '0%, 100%': { opacity: '1', transform: 'scale(1)' },
           '50%': { opacity: '0.5', transform: 'scale(1.08)' },
         },
+        'timer-bar': {
+          '0%': { width: '100%', backgroundColor: 'var(--primary)' },
+          '50%': { backgroundColor: 'var(--caution)' },
+          '85%': { backgroundColor: 'var(--danger)' },
+          '100%': { width: '0%', backgroundColor: 'var(--danger)' },
+        },
       },
       animation: {
         'turn-glow': 'turn-glow 2s ease-in-out infinite',
