@@ -5,7 +5,6 @@ import { ClientPlayerState } from '../../../shared/types/player';
 import { Card } from '../../../shared/types/card';
 import CardComponent from '../ui/Card';
 import HitBadge from '../ui/HitBadge';
-import ShowLockBadge from '../ui/ShowLockBadge';
 import { useGameStore } from '../../store/game-store';
 
 interface PlayerSeatProps {
@@ -109,8 +108,9 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
           )}
 
           {/* HIT indicator dot */}
-          {player.hit.hitRevealed && (
-            <span className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-danger border-2 border-surface-1" />
+          {player.hit.hitRevealed && !player.folded && (
+            <span className={`absolute -top-1 -left-1 w-3 h-3 rounded-full bg-danger border-2 border-surface-1
+              ${isCurrentTurn ? 'animate-hit-blink' : ''}`} />
           )}
 
           {/* Info */}
@@ -147,16 +147,9 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
           </div>
         )}
 
-        {/* HIT / SHOW badges */}
-        {(player.hit.hitRevealed || (player.hit.mustShowIfNotFolded && !player.folded)) && (
-          <div className="flex gap-1">
-            {player.hit.hitRevealed && (
-              <HitBadge hitSource={player.hit.hitSource} size="sm" />
-            )}
-            {player.hit.mustShowIfNotFolded && !player.folded && (
-              <ShowLockBadge size="sm" />
-            )}
-          </div>
+        {/* HIT badge - blinks when it's this player's turn */}
+        {player.hit.hitRevealed && !player.folded && (
+          <HitBadge hitSource={player.hit.hitSource} size="sm" blink={isCurrentTurn} />
         )}
       </div>
     </div>

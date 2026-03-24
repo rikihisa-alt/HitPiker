@@ -4,7 +4,6 @@ import { useState, useRef, useCallback } from 'react';
 import { Card } from '../../../shared/types/card';
 import CardComponent from '../ui/Card';
 import HitBadge from '../ui/HitBadge';
-import ShowLockBadge from '../ui/ShowLockBadge';
 import { ClientPlayerState } from '../../../shared/types/player';
 
 interface HoleCardsProps {
@@ -14,7 +13,7 @@ interface HoleCardsProps {
   canFold?: boolean;
 }
 
-const FOLD_THRESHOLD = 80; // ドラッグ距離のしきい値(px)
+const FOLD_THRESHOLD = 80;
 
 export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsProps) {
   const [dragY, setDragY] = useState(0);
@@ -32,7 +31,6 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
   const handleMove = useCallback((clientY: number) => {
     if (!isDragging) return;
     const delta = clientY - startY.current;
-    // 下方向のみ許可
     setDragY(Math.max(0, delta));
   }, [isDragging]);
 
@@ -41,7 +39,6 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
     setIsDragging(false);
 
     if (dragY >= FOLD_THRESHOLD && canFold && onFold) {
-      // フォールドアニメーション
       setIsFolding(true);
       setDragY(200);
       setTimeout(() => {
@@ -50,18 +47,15 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
         setDragY(0);
       }, 300);
     } else {
-      // 元に戻す
       setDragY(0);
     }
   }, [isDragging, dragY, canFold, onFold]);
 
-  // マウスイベント
   const onMouseDown = (e: React.MouseEvent) => handleStart(e.clientY);
   const onMouseMove = (e: React.MouseEvent) => handleMove(e.clientY);
   const onMouseUp = () => handleEnd();
   const onMouseLeave = () => { if (isDragging) handleEnd(); };
 
-  // タッチイベント
   const onTouchStart = (e: React.TouchEvent) => handleStart(e.touches[0].clientY);
   const onTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
@@ -75,9 +69,17 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
   const opacity = isFolding ? 0 : 1 - progress * 0.6;
   const scale = 1 - progress * 0.15;
   const rotation = progress * 8;
+  const isHit = player?.hit.hitRevealed ?? false;
 
   return (
     <div className="relative select-none">
+      {/* HIT badge above cards - always visible when hit */}
+      {isHit && (
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-20">
+          <HitBadge hitSource={player?.hit.hitSource ?? null} size="lg" blink />
+        </div>
+      )}
+
       <div
         ref={containerRef}
         onMouseDown={onMouseDown}
@@ -89,7 +91,7 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
         onTouchEnd={onTouchEnd}
         className={`flex items-center gap-3 bg-surface-1 backdrop-blur-sm rounded-lg px-4 py-2 border
           ${canFold ? 'cursor-grab active:cursor-grabbing' : ''}
-          ${isDragging ? 'border-danger/40' : 'border-border'}
+          ${isDragging ? 'border-danger/40' : isHit ? 'border-danger/50' : 'border-border'}
           ${isFolding ? 'transition-all duration-300' : isDragging ? '' : 'transition-all duration-200'}`}
         style={{
           transform: `translateY(${dragY}px) scale(${scale}) rotate(${rotation}deg)`,
@@ -101,16 +103,6 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
             <CardComponent key={`hole-${i}`} card={card} size="lg" />
           ))}
         </div>
-        {player && (player.hit.hitRevealed || (player.hit.mustShowIfNotFolded && !player.folded)) && (
-          <div className="flex items-center gap-1">
-            {player.hit.hitRevealed && (
-              <HitBadge hitSource={player.hit.hitSource} />
-            )}
-            {player.hit.mustShowIfNotFolded && !player.folded && (
-              <ShowLockBadge />
-            )}
-          </div>
-        )}
       </div>
 
       {/* Drag hint */}

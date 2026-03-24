@@ -68,6 +68,10 @@ module.exports = {
           '50%': { transform: 'rotateY(90deg) scale(0.9)', opacity: '0.5' },
           '100%': { transform: 'rotateY(0deg) scale(1)', opacity: '1' },
         },
+        'hit-blink': {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.5', transform: 'scale(1.08)' },
+        },
       },
       animation: {
         'turn-glow': 'turn-glow 2s ease-in-out infinite',
@@ -75,6 +79,7 @@ module.exports = {
         'slide-up': 'slide-up 0.25s ease-out',
         'chip-float': 'chip-float 1.5s ease-out forwards',
         'card-flip': 'card-flip 0.4s ease-out both',
+        'hit-blink': 'hit-blink 0.8s ease-in-out infinite',
       },
     },
   },
