@@ -54,7 +54,7 @@ export default function ActionPanel() {
   const canBetOrRaise = canBet || canRaise;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 animate-slide-up">
+    <div className="fixed bottom-4 right-4 z-50 w-80 animate-slide-up">
       <div className="bg-surface-1/95 backdrop-blur-md border border-border rounded-lg shadow-lg p-3">
 
         {/* Bet/Raise controls */}
