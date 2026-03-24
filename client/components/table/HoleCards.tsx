@@ -76,7 +76,7 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
 
   const handleStart = useCallback((clientY: number) => {
     if (!canFold) return;
-    if (squeezed) return; // Don't allow fold drag during squeeze
+    if (squeezed) return;
     startY.current = clientY;
     setIsDragging(true);
   }, [canFold, squeezed]);
@@ -138,7 +138,6 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
   const opacity = isFolding ? 0 : 1 - progress * 0.6;
   const scale = 1 - progress * 0.15;
   const rotation = progress * 8;
-  // Show HIT as soon as qualified (for self, we know immediately), or when revealed
   const isHit = (player?.hit.hitQualified ?? false) || (player?.hit.hitRevealed ?? false);
 
   return (
@@ -150,6 +149,7 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
         </div>
       )}
 
+      {/* Card tray - recessed dark shelf */}
       <div
         ref={containerRef}
         onMouseDown={onMouseDown}
@@ -159,13 +159,18 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        className={`flex items-center gap-3 bg-surface-1 backdrop-blur-sm rounded-lg px-4 py-2 border
+        className={`flex items-center justify-center gap-3 rounded-xl px-5 py-2.5
           ${squeezed ? 'cursor-pointer' : canFold ? 'cursor-grab active:cursor-grabbing' : ''}
-          ${isDragging ? 'border-danger/40' : isHit && !squeezed ? 'border-danger/50' : 'border-border'}
           ${isFolding ? 'transition-all duration-300' : isDragging ? '' : 'transition-all duration-200'}`}
         style={{
           transform: `translateY(${dragY}px) scale(${scale}) rotate(${rotation}deg)`,
           opacity,
+          background: 'linear-gradient(180deg, rgba(15,17,22,0.85), rgba(10,12,16,0.95))',
+          boxShadow: isDragging
+            ? 'inset 0 2px 6px rgba(0,0,0,0.5), 0 0 0 1px rgba(224,84,84,0.3)'
+            : isHit && !squeezed
+              ? 'inset 0 2px 6px rgba(0,0,0,0.5), 0 0 0 1px rgba(224,84,84,0.35)'
+              : 'inset 0 2px 6px rgba(0,0,0,0.5), 0 0 0 1px rgba(46,49,64,0.6)',
         }}
       >
         <div className="flex gap-1.5">
@@ -199,9 +204,10 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
         </div>
       )}
 
-      {/* Squeeze hint */}
+      {/* Squeeze hint - poker-appropriate muted style */}
       {squeezed && revealedCount === 0 && (
-        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-primary whitespace-nowrap font-semibold animate-pulse">
+        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-text-sub
+          whitespace-nowrap font-medium tracking-wide opacity-70">
           Tap to reveal
         </div>
       )}
@@ -219,7 +225,7 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
           style={{ opacity: progress }}
         >
-          <div className={`px-3 py-1 rounded-pill text-xs font-semibold border
+          <div className={`px-3 py-1 rounded-lg text-xs font-semibold border
             ${progress >= 1
               ? 'bg-danger text-danger-fg border-danger'
               : 'bg-danger-soft text-danger border-danger/30'

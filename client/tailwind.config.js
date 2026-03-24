@@ -47,9 +47,9 @@ module.exports = {
         card: 'var(--shadow-card)',
       },
       keyframes: {
-        'turn-glow': {
-          '0%, 100%': { boxShadow: '0 0 0 2px var(--primary), 0 0 12px rgba(74, 142, 255, 0.15)' },
-          '50%': { boxShadow: '0 0 0 2px var(--primary), 0 0 20px rgba(74, 142, 255, 0.3)' },
+        'turn-breathe': {
+          '0%, 100%': { borderColor: 'var(--primary)', opacity: '1' },
+          '50%': { borderColor: 'var(--primary)', opacity: '0.6' },
         },
         'fade-in': {
           from: { opacity: '0', transform: 'translateY(4px)' },
@@ -68,9 +68,15 @@ module.exports = {
           '50%': { transform: 'rotateY(90deg) scale(0.9)', opacity: '0.5' },
           '100%': { transform: 'rotateY(0deg) scale(1)', opacity: '1' },
         },
-        'hit-blink': {
-          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
-          '50%': { opacity: '0.5', transform: 'scale(1.08)' },
+        'hit-glow': {
+          '0%, 100%': {
+            boxShadow: '0 0 4px rgba(224, 84, 84, 0.4), 0 0 8px rgba(224, 84, 84, 0.15)',
+            opacity: '1',
+          },
+          '50%': {
+            boxShadow: '0 0 8px rgba(224, 84, 84, 0.7), 0 0 16px rgba(224, 84, 84, 0.3)',
+            opacity: '0.85',
+          },
         },
         'timer-bar': {
           '0%': { width: '100%', backgroundColor: 'var(--primary)' },
@@ -85,12 +91,12 @@ module.exports = {
         },
       },
       animation: {
-        'turn-glow': 'turn-glow 2s ease-in-out infinite',
+        'turn-breathe': 'turn-breathe 2.4s ease-in-out infinite',
         'fade-in': 'fade-in 0.2s ease-out',
         'slide-up': 'slide-up 0.25s ease-out',
         'chip-float': 'chip-float 1.5s ease-out forwards',
         'card-flip': 'card-flip 0.4s ease-out both',
-        'hit-blink': 'hit-blink 0.8s ease-in-out infinite',
+        'hit-glow': 'hit-glow 1.6s ease-in-out infinite',
       },
     },
   },

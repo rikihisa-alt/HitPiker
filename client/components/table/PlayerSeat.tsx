@@ -17,13 +17,13 @@ interface PlayerSeatProps {
   chipDelta?: number;
 }
 
-const ACTION_LABELS: Record<string, { text: string; color: string }> = {
-  fold: { text: 'FOLD', color: 'text-text-muted' },
-  check: { text: 'CHECK', color: 'text-positive' },
-  call: { text: 'CALL', color: 'text-primary' },
-  bet: { text: 'BET', color: 'text-caution' },
-  raise: { text: 'RAISE', color: 'text-caution' },
-  'all-in': { text: 'ALL IN', color: 'text-danger' },
+const ACTION_LABELS: Record<string, { text: string; bg: string; fg: string }> = {
+  fold: { text: 'FOLD', bg: 'bg-surface-2', fg: 'text-text-muted' },
+  check: { text: 'CHECK', bg: 'bg-positive-soft', fg: 'text-positive' },
+  call: { text: 'CALL', bg: 'bg-primary-soft', fg: 'text-primary' },
+  bet: { text: 'BET', bg: 'bg-caution-soft', fg: 'text-caution' },
+  raise: { text: 'RAISE', bg: 'bg-caution-soft', fg: 'text-caution' },
+  'all-in': { text: 'ALL IN', bg: 'bg-danger-soft', fg: 'text-danger' },
 };
 
 /** Format amount based on stack display setting */
@@ -36,15 +36,25 @@ function formatAmount(amount: number, display: StackDisplay): string {
 
 /** Chip color based on bet amount */
 function getChipColor(amount: number): string {
-  if (amount >= 1000) return '#e05454';   // red
-  if (amount >= 500) return '#2dd4a0';    // green
-  if (amount >= 100) return '#4a8eff';    // blue
-  return '#8b8fa3';                        // gray
+  if (amount >= 1000) return '#e05454';
+  if (amount >= 500) return '#2dd4a0';
+  if (amount >= 100) return '#4a8eff';
+  return '#8b8fa3';
 }
 
 /** Determine if seat is in the top half of the table */
 function isTopHalf(positionTop: string): boolean {
   return parseFloat(positionTop) < 50;
+}
+
+/** Hash a name string to pick a consistent avatar color */
+function avatarColor(name: string): string {
+  const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#14b8a6', '#06b6d4', '#84cc16'];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
 }
 
 export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, chipDelta }: PlayerSeatProps) {
@@ -60,7 +70,6 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
   useEffect(() => {
     setStackDisplay(loadSettings().stackDisplay);
 
-    // Listen for storage changes (in case settings change while this component is mounted)
     function handleStorage() {
       setStackDisplay(loadSettings().stackDisplay);
     }
@@ -68,7 +77,7 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
     return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
-  // Also poll settings periodically to catch same-tab changes from the settings panel
+  // Poll settings for same-tab changes
   useEffect(() => {
     const interval = setInterval(() => {
       const current = loadSettings().stackDisplay;
@@ -112,9 +121,10 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
   const displayCards = revealedCards || ((!isSelf && player.holeCards.length > 0) ? player.holeCards : null);
   const topHalf = isTopHalf(position.top);
   const hasBet = player.currentBet > 0 && !player.folded;
-  // Self seat: chips and dealer always go ABOVE capsule (toward center, away from hand cards at bottom)
   const chipAbove = isSelf || !topHalf;
   const chipBelow = !chipAbove;
+
+  const isFolded = player.folded;
 
   return (
     <div
@@ -127,7 +137,7 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
           key={activeEmote.timestamp}
           className="absolute -top-10 left-1/2 -translate-x-1/2 z-30 pointer-events-none
             text-sm font-bold whitespace-nowrap bg-surface-1/90 backdrop-blur-sm
-            border border-border rounded-md px-2 py-0.5 shadow-lg"
+            border border-border rounded-lg px-2 py-0.5 shadow-lg"
           style={{
             animation: 'emote-float 2s ease-out forwards',
           }}
@@ -173,17 +183,26 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
           <DealerPuck topHalf={topHalf && !isSelf} />
         )}
 
-        {/* Main capsule */}
-        <div className={`relative flex items-center gap-2 px-3 py-1.5 rounded-pill
-          bg-surface-1/90 backdrop-blur-sm border transition-all duration-200 overflow-hidden
-          ${isCurrentTurn ? 'border-primary animate-turn-glow' : 'border-border'}
-          ${player.folded ? 'opacity-40 grayscale' : ''}
-          ${player.disconnected ? 'opacity-30' : ''}
-          ${isSelf && !player.folded ? 'border-primary/30' : ''}`}
+        {/* Main seat card */}
+        <div
+          className={`relative flex items-center gap-2.5 px-3 py-2 rounded-xl
+            bg-surface-1/90 backdrop-blur-sm border-2 transition-all duration-200 overflow-hidden
+            ${isCurrentTurn && isActive
+              ? 'border-primary animate-turn-breathe'
+              : isSelf && !isFolded
+                ? 'border-primary/25'
+                : 'border-border'
+            }
+            ${player.disconnected ? 'opacity-30' : ''}`}
+          style={isFolded ? {
+            filter: 'saturate(0.35)',
+            transform: 'scale(0.95)',
+            opacity: 0.55,
+          } : undefined}
         >
-          {/* Position badge (SB/BB only - dealer uses felt puck) */}
+          {/* Position badge (SB/BB) */}
           {(player.isSB || player.isBB) && (
-            <span className="absolute -top-2 -right-1 text-[9px] font-bold px-1.5 py-0 rounded-pill
+            <span className="absolute -top-2 -right-1 text-[9px] font-bold px-1.5 py-0 rounded-md
               bg-surface-raised border border-border text-text-sub">
               {player.isSB ? 'SB' : 'BB'}
             </span>
@@ -191,34 +210,29 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
 
           {/* HIT indicator dot */}
           {player.hit.hitRevealed && !player.folded && (
-            <span className={`absolute -top-1 -left-1 w-3 h-3 rounded-full bg-danger border-2 border-surface-1
-              ${isCurrentTurn ? 'animate-hit-blink' : ''}`} />
+            <span className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-danger border-2 border-surface-1" />
           )}
 
-          {/* Avatar */}
-          <div
-            className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
-            style={{
-              fontSize: '11px',
-              backgroundColor: (() => {
-                const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#14b8a6', '#06b6d4', '#84cc16'];
-                let hash = 0;
-                for (let i = 0; i < player.name.length; i++) {
-                  hash = player.name.charCodeAt(i) + ((hash << 5) - hash);
-                }
-                return colors[Math.abs(hash) % colors.length];
-              })(),
-            }}
-          >
-            {player.name.charAt(0).toUpperCase()}
+          {/* Avatar with active ring */}
+          <div className="relative flex-shrink-0">
+            <div
+              className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-bold
+                ${isCurrentTurn && isActive ? 'ring-2 ring-primary/50 ring-offset-1 ring-offset-surface-1' : ''}`}
+              style={{
+                fontSize: '12px',
+                backgroundColor: avatarColor(player.name),
+              }}
+            >
+              {player.name.charAt(0).toUpperCase()}
+            </div>
           </div>
 
-          {/* Info */}
-          <div className="flex flex-col items-center min-w-[60px]">
-            <span className="text-[11px] text-text-sub truncate max-w-[80px]">
+          {/* Info stacked on right */}
+          <div className="flex flex-col items-start min-w-[56px]">
+            <span className="text-[11px] text-text-sub truncate max-w-[80px] leading-tight">
               {player.name}
             </span>
-            <span className="chip-amt text-xs font-semibold text-text">
+            <span className="chip-amt text-xs font-bold text-text tabular-nums leading-tight">
               {formatAmount(player.stack, stackDisplay)}
             </span>
           </div>
@@ -227,12 +241,13 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
           {isCurrentTurn && isActive && (
             <div
               key={timerRef.current}
-              className="absolute bottom-0 left-0 h-[3px] w-full"
+              className="absolute bottom-0 left-0 h-[2px] w-full"
             >
               <div
-                className="h-full rounded-b-pill"
+                className="h-full rounded-b-xl"
                 style={{
                   animation: `timer-bar ${GAME_CONSTANTS.ACTION_TIMEOUT_MS}ms linear forwards`,
+                  background: 'linear-gradient(90deg, var(--primary), var(--caution))',
                 }}
               />
             </div>
@@ -244,11 +259,13 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
           <BetChip amount={player.currentBet} direction="below" stackDisplay={stackDisplay} />
         )}
 
-        {/* Action label below capsule */}
+        {/* Action label as a badge */}
         {player.lastAction && isActive && (
           <div className="whitespace-nowrap">
-            <span className={`text-[10px] font-semibold uppercase tracking-wide
-              ${ACTION_LABELS[player.lastAction]?.color ?? 'text-text-sub'}`}>
+            <span className={`inline-block text-[10px] font-semibold uppercase tracking-wide
+              px-2 py-0.5 rounded-md
+              ${ACTION_LABELS[player.lastAction]?.bg ?? 'bg-surface-2'}
+              ${ACTION_LABELS[player.lastAction]?.fg ?? 'text-text-sub'}`}>
               {ACTION_LABELS[player.lastAction]?.text ?? player.lastAction.toUpperCase()}
             </span>
           </div>
@@ -257,7 +274,9 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
         {/* Disconnected label */}
         {player.disconnected && (
           <div className="whitespace-nowrap">
-            <span className="text-[10px] text-danger font-semibold">DISCONNECTED</span>
+            <span className="inline-block text-[10px] text-danger font-semibold bg-danger-soft px-2 py-0.5 rounded-md">
+              DISCONNECTED
+            </span>
           </div>
         )}
 
@@ -276,12 +295,13 @@ function BetChip({ amount, direction, stackDisplay }: { amount: number; directio
 
   return (
     <div className={`flex items-center gap-1 ${direction === 'above' ? 'mb-1' : 'mt-1'}`}>
-      {/* Chip circle */}
+      {/* Chip circle with inner dashed ring */}
       <span
-        className="inline-block w-[14px] h-[14px] rounded-full border-2 border-white/30 flex-shrink-0"
+        className="inline-block w-[14px] h-[14px] rounded-full flex-shrink-0"
         style={{
           backgroundColor: chipColor,
-          boxShadow: `0 1px 3px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2)`,
+          border: '2px solid rgba(255,255,255,0.25)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2)',
         }}
       />
       {/* Amount */}
@@ -292,20 +312,21 @@ function BetChip({ amount, direction, stackDisplay }: { amount: number; directio
   );
 }
 
-/** Dealer button puck on the felt */
+/** Dealer button puck with beveled gradient */
 function DealerPuck({ topHalf }: { topHalf: boolean }) {
   return (
     <div
       className={`absolute z-20 ${topHalf ? '-bottom-3 -right-4' : '-top-3 -right-4'}`}
     >
       <div
-        className="w-5 h-5 rounded-full bg-white flex items-center justify-center
-          border border-gray-300"
+        className="w-5 h-5 rounded-full flex items-center justify-center"
         style={{
-          boxShadow: '0 1px 4px rgba(0,0,0,0.35)',
+          background: 'linear-gradient(145deg, #ffffff, #dde0e4)',
+          border: '1px solid #c0c4cc',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.9)',
         }}
       >
-        <span className="text-[10px] font-bold text-gray-800 leading-none">D</span>
+        <span className="text-[10px] font-extrabold text-gray-700 leading-none" style={{ textShadow: '0 1px 0 rgba(255,255,255,0.6)' }}>D</span>
       </div>
     </div>
   );

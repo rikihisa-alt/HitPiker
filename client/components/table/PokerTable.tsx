@@ -87,13 +87,45 @@ export default function PokerTable() {
       </div>
 
       {/* Felt table */}
-      <div className="absolute inset-4 sm:inset-6 lg:inset-8 rounded-[50%]
-        bg-gradient-to-b from-felt to-felt-deep
-        border-[6px] border-black/20
-        shadow-[inset_0_4px_30px_rgba(0,0,0,0.5),0_0_40px_rgba(0,0,0,0.3)]">
+      <div
+        className="absolute inset-4 sm:inset-6 lg:inset-8 rounded-[50%] felt-texture"
+        style={{
+          background: 'linear-gradient(180deg, var(--felt), var(--felt-deep))',
+          borderWidth: '6px',
+          borderStyle: 'solid',
+          borderColor: '#3a2518',
+          boxShadow: `
+            inset 0 4px 30px rgba(0,0,0,0.5),
+            inset 0 0 60px rgba(0,0,0,0.15),
+            0 0 0 2px rgba(80,50,20,0.4),
+            0 0 40px rgba(0,0,0,0.3)
+          `,
+        }}
+      >
+        {/* Wood rail inner highlight */}
+        <div
+          className="absolute inset-0 rounded-[50%] pointer-events-none"
+          style={{
+            boxShadow: 'inset 0 1px 0 rgba(255,220,160,0.12), inset 0 -1px 0 rgba(0,0,0,0.3)',
+          }}
+        />
 
-        {/* Subtle felt texture line */}
-        <div className="absolute inset-5 rounded-[50%] border border-felt-line" />
+        {/* Vignette overlay — darker edges, lighter center */}
+        <div
+          className="absolute inset-0 rounded-[50%] pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(0,0,0,0.25) 100%)',
+          }}
+        />
+
+        {/* Embroidered stitch line */}
+        <div
+          className="absolute inset-5 rounded-[50%] pointer-events-none"
+          style={{
+            border: '1.5px dashed rgba(255,255,255,0.07)',
+            backgroundClip: 'padding-box',
+          }}
+        />
 
         {/* Center: board + pot (side by side) */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2

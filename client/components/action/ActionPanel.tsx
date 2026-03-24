@@ -106,7 +106,7 @@ export default function ActionPanel() {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 w-80 animate-slide-up">
-      <div className="bg-surface-1/95 backdrop-blur-md border border-border rounded-lg shadow-lg p-3">
+      <div className="bg-surface-1/95 backdrop-blur-md border border-border rounded-xl shadow-lg p-3">
 
         {/* Bet/Raise controls */}
         {betMode && (
@@ -129,33 +129,38 @@ export default function ActionPanel() {
           </div>
         )}
 
-        {/* Action buttons */}
-        <div className="flex gap-2">
-          {/* FOLD */}
+        {/* Action buttons with hierarchy */}
+        <div className="flex gap-2 items-end">
+          {/* FOLD - smallest, subdued */}
           {canFold && (
             <button
               onClick={() => handleAction('fold')}
-              className="btn btn-danger flex-1 py-2.5 text-sm rounded-md active:scale-[0.97]"
+              className="py-2 px-3 text-xs rounded-lg border border-danger/20
+                bg-danger-soft text-danger font-medium
+                hover:bg-danger/15 active:scale-[0.97] transition-all
+                w-[72px] shrink-0"
             >
               FOLD
             </button>
           )}
 
-          {/* CHECK */}
+          {/* CHECK - medium */}
           {canCheck && (
             <button
               onClick={() => handleAction('check')}
-              className="btn btn-positive flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]"
+              className="btn btn-positive py-3 text-sm font-semibold rounded-lg border border-positive/20
+                active:scale-[0.97] flex-1"
             >
               CHECK
             </button>
           )}
 
-          {/* CALL */}
+          {/* CALL - medium */}
           {canCall && (
             <button
               onClick={() => handleAction('call')}
-              className="btn btn-primary flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]"
+              className="btn btn-primary py-3 text-sm font-semibold rounded-lg border border-primary/20
+                active:scale-[0.97] flex-1"
             >
               <div className="flex flex-col items-center leading-tight">
                 <span>CALL</span>
@@ -166,13 +171,21 @@ export default function ActionPanel() {
             </button>
           )}
 
-          {/* BET / RAISE */}
+          {/* BET / RAISE - largest, prominent with elevation */}
           {canBetOrRaise && (
             betMode ? (
               <button
                 onClick={handleBetConfirm}
-                className={`btn flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]
-                  ${confirmAllIn ? 'bg-danger text-danger-fg' : 'btn-caution'}`}
+                className={`py-3.5 text-sm font-bold rounded-lg border active:scale-[0.97] transition-all flex-1
+                  ${confirmAllIn
+                    ? 'bg-danger text-danger-fg border-danger/40'
+                    : 'btn-caution border-caution/20'
+                  }`}
+                style={{
+                  boxShadow: confirmAllIn
+                    ? '0 2px 8px rgba(224,84,84,0.3)'
+                    : '0 2px 8px rgba(229,160,48,0.2)',
+                }}
               >
                 <div className="flex flex-col items-center leading-tight">
                   {confirmAllIn ? (
@@ -190,28 +203,29 @@ export default function ActionPanel() {
             ) : (
               <button
                 onClick={openBetMode}
-                className="btn btn-caution flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]"
+                className="btn btn-caution py-3.5 text-sm font-bold rounded-lg border border-caution/20
+                  active:scale-[0.97] flex-1"
+                style={{ boxShadow: '0 2px 8px rgba(229,160,48,0.2)' }}
               >
                 {canBet ? 'BET' : 'RAISE'}
               </button>
             )
           )}
 
-          {/* ALL-IN (fallback when bet/raise unavailable) */}
+          {/* ALL-IN (fallback when bet/raise unavailable) - distinct danger style */}
           {canAllIn && !canBetOrRaise && (
             <button
               onClick={handleAllInClick}
-              className={`btn flex-[1.3] py-2.5 text-sm font-bold rounded-md active:scale-[0.97]
-                ${confirmAllIn ? 'bg-danger/80 text-danger-fg animate-pulse' : 'bg-danger text-danger-fg'}`}
+              className={`py-3.5 text-sm font-bold rounded-xl border active:scale-[0.97] transition-all flex-1
+                ${confirmAllIn
+                  ? 'bg-danger/80 text-danger-fg border-danger/50 animate-pulse'
+                  : 'bg-danger text-danger-fg border-danger/30'
+                }`}
+              style={{ boxShadow: '0 2px 10px rgba(224,84,84,0.3)' }}
             >
               {confirmAllIn ? 'CONFIRM ALL-IN?' : 'ALL-IN'}
             </button>
           )}
-        </div>
-
-        {/* Keyboard shortcut hints */}
-        <div className="text-[9px] text-text-muted opacity-50 text-center mt-1.5 tracking-wide select-none">
-          F:Fold  C:Call  R:Raise  A:All-in
         </div>
       </div>
     </div>

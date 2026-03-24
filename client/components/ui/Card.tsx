@@ -15,11 +15,12 @@ const SUIT_SYMBOLS: Record<Suit, string> = {
   club: '\u2663',
 };
 
-const SUIT_COLORS: Record<Suit, { text: string; bg: string }> = {
-  spade: { text: 'text-slate-800', bg: 'bg-slate-50' },
-  heart: { text: 'text-rose-600', bg: 'bg-rose-50/50' },
-  diamond: { text: 'text-blue-600', bg: 'bg-blue-50/50' },
-  club: { text: 'text-emerald-700', bg: 'bg-emerald-50/50' },
+// 4-color deck: spade=black, heart=red, diamond=blue, club=green
+const SUIT_COLORS: Record<Suit, string> = {
+  spade: '#1a1a2e',
+  heart: '#c62828',
+  diamond: '#1565c0',
+  club: '#2e7d32',
 };
 
 const RANK_LABELS: Record<Rank, string> = {
@@ -27,24 +28,28 @@ const RANK_LABELS: Record<Rank, string> = {
   10: '10', 11: 'J', 12: 'Q', 13: 'K', 14: 'A',
 };
 
+// Real card proportions: 2.5:3.5 ratio
 const SIZE_CONFIG = {
   sm: {
-    card: 'w-9 h-[52px]',
-    rank: 'text-[11px] font-bold',
-    suit: 'text-[9px]',
-    center: 'text-base',
+    card: 'w-[34px] h-[48px]',
+    rank: 'text-[10px] font-extrabold leading-none',
+    suit: 'text-[8px] leading-none',
+    center: 'text-[16px]',
+    padding: 'p-[2px]',
   },
   md: {
-    card: 'w-12 h-[68px]',
-    rank: 'text-sm font-bold',
-    suit: 'text-[10px]',
-    center: 'text-xl',
+    card: 'w-[46px] h-[64px]',
+    rank: 'text-[13px] font-extrabold leading-none',
+    suit: 'text-[9px] leading-none',
+    center: 'text-[22px]',
+    padding: 'p-[3px]',
   },
   lg: {
-    card: 'w-16 h-[92px]',
-    rank: 'text-base font-bold',
-    suit: 'text-xs',
-    center: 'text-2xl',
+    card: 'w-[62px] h-[86px]',
+    rank: 'text-[16px] font-extrabold leading-none',
+    suit: 'text-[11px] leading-none',
+    center: 'text-[28px]',
+    padding: 'p-[4px]',
   },
 };
 
@@ -54,15 +59,41 @@ export default function CardComponent({ card, size = 'md', faceDown }: CardProps
   // Face down / hidden card
   if (faceDown || !isVisibleCard(card)) {
     return (
-      <div className={`${cfg.card} rounded-md shadow-card select-none
-        bg-gradient-to-br from-[#1e3a5f] to-[#0f1f35]
-        border border-[#2a4a6f]/60
-        flex items-center justify-center`}
+      <div
+        className={`${cfg.card} rounded-[5px] select-none card-back relative overflow-hidden`}
+        style={{
+          background: 'linear-gradient(145deg, #1e3a5f, #0f1f35)',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
+          border: '1px solid rgba(42,74,111,0.5)',
+        }}
       >
-        <div className="w-[70%] h-[75%] rounded-sm border border-[#3a5a8f]/40
-          bg-gradient-to-br from-[#1a3050]/60 to-[#0d1825]/60
-          flex items-center justify-center">
-          <span className="text-[#4a7aaf]/50 text-[8px] font-bold tracking-widest">HP</span>
+        {/* Cross-hatch pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,1) 3px, rgba(255,255,255,1) 3.5px),
+              repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(255,255,255,1) 3px, rgba(255,255,255,1) 3.5px)
+            `,
+          }}
+        />
+        {/* Inner border with gold/cream accent */}
+        <div
+          className="absolute inset-[3px] rounded-[3px] flex items-center justify-center"
+          style={{
+            border: '1px solid rgba(210,190,140,0.15)',
+          }}
+        >
+          {/* Embossed HP text */}
+          <span
+            className="text-[8px] font-bold tracking-[0.15em] select-none"
+            style={{
+              color: 'rgba(74,122,175,0.25)',
+              textShadow: '0 1px 1px rgba(0,0,0,0.4), 0 -1px 0 rgba(255,255,255,0.05)',
+            }}
+          >
+            HP
+          </span>
         </div>
       </div>
     );
@@ -70,27 +101,37 @@ export default function CardComponent({ card, size = 'md', faceDown }: CardProps
 
   const { suit, rank } = card;
   const symbol = SUIT_SYMBOLS[suit];
-  const colors = SUIT_COLORS[suit];
+  const suitColor = SUIT_COLORS[suit];
   const label = RANK_LABELS[rank];
 
   return (
-    <div className={`${cfg.card} ${colors.bg} rounded-md shadow-card select-none cursor-default
-      bg-white border border-gray-200/80
-      flex flex-col justify-between p-[3px] relative overflow-hidden`}
+    <div
+      className={`${cfg.card} rounded-[5px] select-none cursor-default
+        flex flex-col justify-between ${cfg.padding} relative overflow-hidden`}
+      style={{
+        backgroundColor: '#f8f6f0',
+        border: '1px solid #e0ddd5',
+        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.15)',
+      }}
     >
       {/* Top-left rank + suit */}
-      <div className={`${colors.text} leading-none flex flex-col items-center w-fit`}>
+      <div className="leading-none flex flex-col items-center w-fit" style={{ color: suitColor }}>
         <span className={cfg.rank}>{label}</span>
         <span className={cfg.suit}>{symbol}</span>
       </div>
 
-      {/* Center suit (large, subtle) */}
-      <div className={`absolute inset-0 flex items-center justify-center pointer-events-none`}>
-        <span className={`${colors.text} ${cfg.center} opacity-20`}>{symbol}</span>
+      {/* Center suit (large, 30% opacity) */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <span
+          className={cfg.center}
+          style={{ color: suitColor, opacity: 0.3 }}
+        >
+          {symbol}
+        </span>
       </div>
 
       {/* Bottom-right rank + suit (inverted) */}
-      <div className={`${colors.text} leading-none flex flex-col items-center w-fit self-end rotate-180`}>
+      <div className="leading-none flex flex-col items-center w-fit self-end rotate-180" style={{ color: suitColor }}>
         <span className={cfg.rank}>{label}</span>
         <span className={cfg.suit}>{symbol}</span>
       </div>

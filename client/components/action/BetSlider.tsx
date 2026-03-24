@@ -66,12 +66,12 @@ export default function BetSlider({ min, max, value, onChange }: BetSliderProps)
   return (
     <div className="w-full px-1">
       <div className="flex items-center gap-2">
-        {/* Minus button */}
+        {/* Minus button — square with rounded corners */}
         <button
           type="button"
           onClick={decrement}
           disabled={value <= min}
-          className="w-7 h-7 rounded-full bg-surface-2 border border-border text-text-sub
+          className="w-7 h-7 rounded-lg bg-surface-2 border border-border text-text-sub
             flex items-center justify-center text-sm font-bold
             hover:bg-surface-raised hover:text-text active:scale-95
             disabled:opacity-30 disabled:pointer-events-none
@@ -83,30 +83,40 @@ export default function BetSlider({ min, max, value, onChange }: BetSliderProps)
         {/* Slider track */}
         <div
           ref={sliderRef}
-          className="relative h-6 flex items-center cursor-pointer flex-1"
+          className="relative h-7 flex items-center cursor-pointer flex-1"
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
         >
-          <div className="absolute w-full h-1 rounded-full bg-surface-raised">
+          {/* Track background with inner shadow */}
+          <div
+            className="absolute w-full h-1.5 rounded-full bg-surface-raised"
+            style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)' }}
+          >
+            {/* Filled portion */}
             <div
               className="h-full rounded-full bg-caution"
               style={{ width: `${percentage}%` }}
             />
           </div>
+          {/* Thumb with inner highlight gradient */}
           <div
-            className="absolute w-5 h-5 rounded-full bg-caution border-2 border-caution-fg
-              shadow-md transform -translate-x-1/2
+            className="absolute w-6 h-6 rounded-full transform -translate-x-1/2
               hover:scale-110 transition-transform"
-            style={{ left: `${percentage}%` }}
+            style={{
+              left: `${percentage}%`,
+              background: 'linear-gradient(145deg, #f0c050, #d49520)',
+              border: '2px solid rgba(255,255,255,0.35)',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.4)',
+            }}
           />
         </div>
 
-        {/* Plus button */}
+        {/* Plus button — square with rounded corners */}
         <button
           type="button"
           onClick={increment}
           disabled={value >= max}
-          className="w-7 h-7 rounded-full bg-surface-2 border border-border text-text-sub
+          className="w-7 h-7 rounded-lg bg-surface-2 border border-border text-text-sub
             flex items-center justify-center text-sm font-bold
             hover:bg-surface-raised hover:text-text active:scale-95
             disabled:opacity-30 disabled:pointer-events-none
@@ -114,12 +124,6 @@ export default function BetSlider({ min, max, value, onChange }: BetSliderProps)
         >
           +
         </button>
-      </div>
-
-      {/* Min / Max labels */}
-      <div className="flex justify-between text-[10px] chip-amt text-text-muted mt-0.5 px-9">
-        <span>{min.toLocaleString()}</span>
-        <span>All-in ({max.toLocaleString()})</span>
       </div>
     </div>
   );

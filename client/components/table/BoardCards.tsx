@@ -42,11 +42,16 @@ export default function BoardCards({ cards }: BoardCardsProps) {
           </div>
         );
       })}
-      {/* Empty slots - subtle outline placeholders */}
+      {/* Empty slots - subtle card-shaped indentations in the felt */}
       {Array.from({ length: 5 - cards.length }).map((_, i) => (
         <div
           key={`empty-${i}`}
-          className="w-11 h-[62px] rounded-md border border-felt-line bg-transparent"
+          className="w-[46px] h-[64px] rounded-[5px]"
+          style={{
+            background: 'rgba(0,0,0,0.08)',
+            border: '1px dashed rgba(255,255,255,0.06)',
+            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)',
+          }}
         />
       ))}
     </div>
