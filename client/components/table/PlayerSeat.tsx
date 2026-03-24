@@ -80,6 +80,9 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
   const displayCards = revealedCards || ((!isSelf && player.holeCards.length > 0) ? player.holeCards : null);
   const topHalf = isTopHalf(position.top);
   const hasBet = player.currentBet > 0 && !player.folded;
+  // Self seat: chips and dealer always go ABOVE capsule (toward center, away from hand cards at bottom)
+  const chipAbove = isSelf || !topHalf;
+  const chipBelow = !chipAbove;
 
   return (
     <div
@@ -98,8 +101,8 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
       )}
 
       <div className="flex flex-col items-center gap-1 relative">
-        {/* Bet chip - ABOVE capsule for bottom-row players */}
-        {hasBet && !topHalf && (
+        {/* Bet chip - ABOVE capsule for self/bottom-row players */}
+        {hasBet && chipAbove && (
           <BetChip amount={player.currentBet} direction="above" />
         )}
 
@@ -120,7 +123,7 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
 
         {/* Dealer button puck on felt */}
         {player.isDealer && (
-          <DealerPuck topHalf={topHalf} />
+          <DealerPuck topHalf={topHalf && !isSelf} />
         )}
 
         {/* Main capsule */}
@@ -189,8 +192,8 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
           )}
         </div>
 
-        {/* Bet chip - BELOW capsule for top-row players */}
-        {hasBet && topHalf && (
+        {/* Bet chip - BELOW capsule for top-row non-self players */}
+        {hasBet && chipBelow && (
           <BetChip amount={player.currentBet} direction="below" />
         )}
 

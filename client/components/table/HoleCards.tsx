@@ -75,7 +75,8 @@ export default function HoleCards({ cards, player, onFold, canFold }: HoleCardsP
   const opacity = isFolding ? 0 : 1 - progress * 0.6;
   const scale = 1 - progress * 0.15;
   const rotation = progress * 8;
-  const isHit = player?.hit.hitRevealed ?? false;
+  // Show HIT as soon as qualified (for self, we know immediately), or when revealed
+  const isHit = (player?.hit.hitQualified ?? false) || (player?.hit.hitRevealed ?? false);
 
   return (
     <div className="relative select-none">
