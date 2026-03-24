@@ -1,11 +1,14 @@
 // Table settings stored in localStorage with sensible defaults
 
 export type FeltColor = 'green' | 'blue' | 'red' | 'purple' | 'dark';
+export type StackDisplay = 'points' | 'bb';
 
 export interface TableSettings {
   feltColor: FeltColor;
   fourColorDeck: boolean;
   soundEnabled: boolean;
+  squeezeEnabled: boolean;
+  stackDisplay: StackDisplay;
 }
 
 const STORAGE_KEY = 'hitpoker-settings';
@@ -14,6 +17,8 @@ const DEFAULTS: TableSettings = {
   feltColor: 'green',
   fourColorDeck: false,
   soundEnabled: true,
+  squeezeEnabled: true,
+  stackDisplay: 'points',
 };
 
 export function loadSettings(): TableSettings {
@@ -26,6 +31,8 @@ export function loadSettings(): TableSettings {
       feltColor: isValidFelt(parsed.feltColor) ? parsed.feltColor : DEFAULTS.feltColor,
       fourColorDeck: typeof parsed.fourColorDeck === 'boolean' ? parsed.fourColorDeck : DEFAULTS.fourColorDeck,
       soundEnabled: typeof parsed.soundEnabled === 'boolean' ? parsed.soundEnabled : DEFAULTS.soundEnabled,
+      squeezeEnabled: typeof parsed.squeezeEnabled === 'boolean' ? parsed.squeezeEnabled : DEFAULTS.squeezeEnabled,
+      stackDisplay: isValidStackDisplay(parsed.stackDisplay) ? parsed.stackDisplay : DEFAULTS.stackDisplay,
     };
   } catch {
     return { ...DEFAULTS };
@@ -43,6 +50,10 @@ export function saveSettings(settings: TableSettings): void {
 
 function isValidFelt(value: unknown): value is FeltColor {
   return typeof value === 'string' && ['green', 'blue', 'red', 'purple', 'dark'].includes(value);
+}
+
+function isValidStackDisplay(value: unknown): value is StackDisplay {
+  return typeof value === 'string' && ['points', 'bb'].includes(value);
 }
 
 // CSS class name for felt color variant

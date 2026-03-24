@@ -7,6 +7,7 @@ import CardComponent from '../ui/Card';
 import HitBadge from '../ui/HitBadge';
 import { useGameStore } from '../../store/game-store';
 import { GAME_CONSTANTS } from '../../../shared/constants/game';
+import { loadSettings, StackDisplay } from '../../lib/settings-store';
 
 interface PlayerSeatProps {
   player: ClientPlayerState;
@@ -25,6 +26,14 @@ const ACTION_LABELS: Record<string, { text: string; color: string }> = {
   'all-in': { text: 'ALL IN', color: 'text-danger' },
 };
 
+/** Format amount based on stack display setting */
+function formatAmount(amount: number, display: StackDisplay): string {
+  if (display === 'bb') {
+    return `${(amount / GAME_CONSTANTS.BIG_BLIND).toFixed(1)} BB`;
+  }
+  return amount.toLocaleString();
+}
+
 /** Chip color based on bet amount */
 function getChipColor(amount: number): string {
   if (amount >= 1000) return '#e05454';   // red
@@ -42,9 +51,31 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
   const [showDelta, setShowDelta] = useState(false);
   const [displayedDelta, setDisplayedDelta] = useState(0);
   const [revealedCards, setRevealedCards] = useState<Card[] | null>(null);
+  const [stackDisplay, setStackDisplay] = useState<StackDisplay>('points');
   const showdownCards = useGameStore((s) => s.showdownCards);
   const activeEmote = useGameStore((s) => s.activeEmote);
   const timerRef = useRef<string>('');
+
+  // Load stack display setting on mount and when localStorage changes
+  useEffect(() => {
+    setStackDisplay(loadSettings().stackDisplay);
+
+    // Listen for storage changes (in case settings change while this component is mounted)
+    function handleStorage() {
+      setStackDisplay(loadSettings().stackDisplay);
+    }
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
+  // Also poll settings periodically to catch same-tab changes from the settings panel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const current = loadSettings().stackDisplay;
+      setStackDisplay((prev) => (prev !== current ? current : prev));
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   // Generate a unique key to reset timer animation when turn changes
   const timerKey = isCurrentTurn ? `${player.id}-${Date.now()}` : '';
@@ -112,14 +143,14 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
             chip-amt text-sm font-bold whitespace-nowrap animate-chip-float
             ${displayedDelta > 0 ? 'text-positive' : 'text-danger'}`}
         >
-          {displayedDelta > 0 ? '+' : ''}{displayedDelta.toLocaleString()}
+          {displayedDelta > 0 ? '+' : ''}{formatAmount(Math.abs(displayedDelta), stackDisplay)}
         </div>
       )}
 
       <div className="flex flex-col items-center gap-1 relative">
         {/* Bet chip - ABOVE capsule for self/bottom-row players */}
         {hasBet && chipAbove && (
-          <BetChip amount={player.currentBet} direction="above" />
+          <BetChip amount={player.currentBet} direction="above" stackDisplay={stackDisplay} />
         )}
 
         {/* Hole cards above seat (other players) */}
@@ -188,7 +219,7 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
               {player.name}
             </span>
             <span className="chip-amt text-xs font-semibold text-text">
-              {player.stack.toLocaleString()}
+              {formatAmount(player.stack, stackDisplay)}
             </span>
           </div>
 
@@ -210,7 +241,7 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
 
         {/* Bet chip - BELOW capsule for top-row non-self players */}
         {hasBet && chipBelow && (
-          <BetChip amount={player.currentBet} direction="below" />
+          <BetChip amount={player.currentBet} direction="below" stackDisplay={stackDisplay} />
         )}
 
         {/* Action label below capsule */}
@@ -240,7 +271,7 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
 }
 
 /** Visual bet chip with amount, positioned toward the center of the table */
-function BetChip({ amount, direction }: { amount: number; direction: 'above' | 'below' }) {
+function BetChip({ amount, direction, stackDisplay }: { amount: number; direction: 'above' | 'below'; stackDisplay: StackDisplay }) {
   const chipColor = getChipColor(amount);
 
   return (
@@ -255,7 +286,7 @@ function BetChip({ amount, direction }: { amount: number; direction: 'above' | '
       />
       {/* Amount */}
       <span className="chip-amt text-[11px] font-semibold text-caution whitespace-nowrap">
-        {amount.toLocaleString()}
+        {formatAmount(amount, stackDisplay)}
       </span>
     </div>
   );

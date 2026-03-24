@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { loadSettings, saveSettings, FeltColor, TableSettings as Settings } from '../../lib/settings-store';
+import { loadSettings, saveSettings, FeltColor, StackDisplay, TableSettings as Settings } from '../../lib/settings-store';
 
 const FELT_OPTIONS: { value: FeltColor; label: string; swatch: string }[] = [
   { value: 'green', label: 'Green', swatch: '#1b4d35' },
@@ -9,6 +9,11 @@ const FELT_OPTIONS: { value: FeltColor; label: string; swatch: string }[] = [
   { value: 'red', label: 'Red', swatch: '#4d1b2a' },
   { value: 'purple', label: 'Purple', swatch: '#351b4d' },
   { value: 'dark', label: 'Dark', swatch: '#1e2028' },
+];
+
+const STACK_OPTIONS: { value: StackDisplay; label: string }[] = [
+  { value: 'points', label: 'Points' },
+  { value: 'bb', label: 'BB' },
 ];
 
 interface TableSettingsProps {
@@ -141,6 +146,45 @@ export default function TableSettings({ onSettingsChange }: TableSettingsProps) 
               />
             </button>
           </label>
+
+          {/* Squeeze toggle */}
+          <label className="flex items-center justify-between cursor-pointer">
+            <span className="text-text-sub text-[11px]">Squeeze</span>
+            <button
+              role="switch"
+              aria-checked={settings.squeezeEnabled}
+              onClick={() => update({ squeezeEnabled: !settings.squeezeEnabled })}
+              className={`relative w-9 h-5 rounded-pill transition-colors ${
+                settings.squeezeEnabled ? 'bg-primary' : 'bg-surface-raised'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${
+                  settings.squeezeEnabled ? 'translate-x-4' : ''
+                }`}
+              />
+            </button>
+          </label>
+
+          {/* Stack display toggle */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-text-sub text-[11px]">Stack Display</span>
+            <div className="flex gap-1">
+              {STACK_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => update({ stackDisplay: opt.value })}
+                  className={`flex-1 text-[11px] font-semibold py-1 rounded-md border transition-all ${
+                    settings.stackDisplay === opt.value
+                      ? 'bg-primary text-white border-primary'
+                      : 'bg-surface-raised text-text-sub border-border-subtle hover:border-border-hover'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
