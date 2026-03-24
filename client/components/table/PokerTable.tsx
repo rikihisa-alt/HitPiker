@@ -103,7 +103,7 @@ export default function PokerTable() {
       ))}
 
       {/* Hole cards (bottom center, pushed up when action panel visible) */}
-      <div className="absolute left-1/2 -translate-x-1/2 z-20 bottom-3">
+      <div className="absolute left-1/3 -translate-x-1/2 z-20 bottom-2">
         <HoleCards cards={myHoleCards} player={myPlayer} canFold={canFold} onFold={handleDragFold} />
       </div>
     </div>
