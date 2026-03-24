@@ -1,14 +1,16 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useGameState } from '../../hooks/useGameState';
 import PlayerSeat from './PlayerSeat';
 import BoardCards from './BoardCards';
 import PotDisplay from './PotDisplay';
 import HoleCards from './HoleCards';
+import TableSettings from '../settings/TableSettings';
 import { useGameStore } from '../../store/game-store';
 import { useSocket } from '../../hooks/useSocket';
 import { useLocalGame } from '../../hooks/useLocalGame';
+import { loadSettings, feltClassName, TableSettings as SettingsType } from '../../lib/settings-store';
 
 // 6人卓の座席位置（楕円配置）
 const SEAT_POSITIONS: { top: string; left: string }[] = [
@@ -27,6 +29,12 @@ export default function PokerTable() {
   const { sendAction: sendSocketAction } = useSocket();
   const { sendAction: sendLocalAction } = useLocalGame();
   const sendAction = isPracticeMode ? sendLocalAction : sendSocketAction;
+
+  const [feltClass, setFeltClass] = useState(() => feltClassName(loadSettings().feltColor));
+
+  const handleSettingsChange = useCallback((s: SettingsType) => {
+    setFeltClass(feltClassName(s.feltColor));
+  }, []);
 
   const canFold = isMyTurn && availableActions.includes('fold');
 
@@ -65,12 +73,17 @@ export default function PokerTable() {
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className={`relative w-full h-full ${feltClass}`}>
       {/* Phase pill - top left */}
       <div className="absolute top-2 left-4 z-10">
         <span className="chip-amt text-[11px] text-text-muted bg-surface-2 border border-border-subtle rounded-pill px-2.5 py-0.5">
           {gameState.phase.toUpperCase()} — #{gameState.handNumber}
         </span>
+      </div>
+
+      {/* Settings gear - top right */}
+      <div className="absolute top-2 right-4 z-10">
+        <TableSettings onSettingsChange={handleSettingsChange} />
       </div>
 
       {/* Felt table */}

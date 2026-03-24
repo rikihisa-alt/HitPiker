@@ -9,6 +9,12 @@ import { useSocketStore } from '../../../store/socket-store';
 import PokerTable from '../../../components/table/PokerTable';
 import ActionPanel from '../../../components/action/ActionPanel';
 import ChatPanel from '../../../components/chat/ChatPanel';
+import { useKeyboardShortcuts } from '../../../hooks/useKeyboardShortcuts';
+import { useGameSounds } from '../../../hooks/useGameSounds';
+import EmotePanel from '../../../components/table/EmotePanel';
+import HandHistoryPanel from '../../../components/history/HandHistoryPanel';
+import SessionStats from '../../../components/stats/SessionStats';
+import EquityBar from '../../../components/table/EquityBar';
 
 export default function RoomPage() {
   const params = useParams();
@@ -21,6 +27,9 @@ export default function RoomPage() {
   const playerId = useGameStore((s) => s.playerId);
   const gameState = useGameStore((s) => s.gameState);
   const lastResult = useGameStore((s) => s.lastResult);
+
+  useKeyboardShortcuts();
+  useGameSounds();
 
   useEffect(() => {
     if (!roomId) {
@@ -97,13 +106,23 @@ export default function RoomPage() {
         </div>
       </div>
 
+      {/* Session stats bar (practice mode) */}
+      <SessionStats />
+
       {/* Table */}
       <div className="absolute inset-0 pt-12">
         <PokerTable />
+        <EquityBar />
       </div>
+
+      {/* Hand history panel */}
+      <HandHistoryPanel />
 
       {/* Action panel */}
       <ActionPanel />
+
+      {/* Emote panel */}
+      <EmotePanel />
 
       {/* Chat (online only) */}
       {!isPracticeMode && <ChatPanel />}

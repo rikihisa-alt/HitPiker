@@ -163,3 +163,10 @@
     letter-spacing: -0.02em;
   }
 }
+
+/* Felt color variants — override CSS custom properties */
+.felt-green { --felt: #1b4d35; --felt-deep: #133826; }
+.felt-blue { --felt: #1b3d5d; --felt-deep: #132838; }
+.felt-red { --felt: #4d1b2a; --felt-deep: #381326; }
+.felt-purple { --felt: #351b4d; --felt-deep: #261338; }
+.felt-dark { --felt: #1e2028; --felt-deep: #15171c; }

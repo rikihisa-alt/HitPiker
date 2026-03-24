@@ -15,6 +15,7 @@ export function useLocalGame() {
   const setShowdownCards = useGameStore((s) => s.setShowdownCards);
   const setRoomInfo = useGameStore((s) => s.setRoomInfo);
   const setIsPracticeMode = useGameStore((s) => s.setIsPracticeMode);
+  const addHandHistory = useGameStore((s) => s.addHandHistory);
   const reset = useGameStore((s) => s.reset);
 
   const startPracticeGame = useCallback((playerName: string, comCount: number) => {
@@ -38,6 +39,9 @@ export function useLocalGame() {
         setLastResult(null);
         setShowdownCards(new Map());
       },
+      onHandHistoryEntry: (entry) => {
+        addHandHistory(entry);
+      },
     });
 
     globalManager = manager;
@@ -46,7 +50,7 @@ export function useLocalGame() {
 
     // ゲーム開始
     manager.startGame();
-  }, [setGameState, setMyHoleCards, setLastResult, setShowdownCards, setRoomInfo, setIsPracticeMode]);
+  }, [setGameState, setMyHoleCards, setLastResult, setShowdownCards, setRoomInfo, setIsPracticeMode, addHandHistory]);
 
   const sendAction = useCallback((action: GameAction) => {
     if (globalManager) {

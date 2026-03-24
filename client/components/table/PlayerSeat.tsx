@@ -43,6 +43,7 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
   const [displayedDelta, setDisplayedDelta] = useState(0);
   const [revealedCards, setRevealedCards] = useState<Card[] | null>(null);
   const showdownCards = useGameStore((s) => s.showdownCards);
+  const activeEmote = useGameStore((s) => s.activeEmote);
   const timerRef = useRef<string>('');
 
   // Generate a unique key to reset timer animation when turn changes
@@ -89,6 +90,21 @@ export default function PlayerSeat({ player, isCurrentTurn, isSelf, position, ch
       className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
       style={{ top: position.top, left: position.left }}
     >
+      {/* Emote float */}
+      {activeEmote && activeEmote.playerId === player.id && (
+        <div
+          key={activeEmote.timestamp}
+          className="absolute -top-10 left-1/2 -translate-x-1/2 z-30 pointer-events-none
+            text-sm font-bold whitespace-nowrap bg-surface-1/90 backdrop-blur-sm
+            border border-border rounded-md px-2 py-0.5 shadow-lg"
+          style={{
+            animation: 'emote-float 2s ease-out forwards',
+          }}
+        >
+          {activeEmote.emote}
+        </div>
+      )}
+
       {/* Chip delta float */}
       {showDelta && displayedDelta !== 0 && (
         <div

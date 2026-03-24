@@ -15,12 +15,20 @@ import {
 } from './engine/game-engine';
 import { getAvailableActions } from './engine/bet-validator';
 import { decideCOMAction, getComActionDelay, getComName } from './com-ai';
+import { evaluateBestHand } from './engine/hand-evaluator';
+import {
+  HandHistoryEntry,
+  HandHistoryAction,
+  HandHistoryPlayer,
+  createHandHistoryEntry,
+} from './hand-history';
 
 export type LocalGameCallback = {
   onGameStateUpdate: (state: ClientGameState, myCards: Card[]) => void;
   onHandResult: (result: HandResult) => void;
   onShowdown: (showdownCards: Map<string, Card[]>) => void;
   onNextHand: () => void;
+  onHandHistoryEntry?: (entry: HandHistoryEntry) => void;
 };
 
 export class LocalGameManager {
@@ -31,6 +39,8 @@ export class LocalGameManager {
   private callbacks: LocalGameCallback;
   private isRunning: boolean = false;
   private actionTimeout: ReturnType<typeof setTimeout> | null = null;
+  private handActions: HandHistoryAction[] = [];
+  private handStartStacks: Map<string, number> = new Map();
 
   constructor(
     playerName: string,
@@ -101,6 +111,13 @@ export class LocalGameManager {
   // 新しいハンドを開始
   private startNewHandInternal(): void {
     if (!this.gameState) return;
+
+    // Reset action tracking for new hand
+    this.handActions = [];
+    this.handStartStacks = new Map();
+    for (const p of this.gameState.players) {
+      this.handStartStacks.set(p.id, p.stack);
+    }
 
     this.deck = new DeckManager();
     const { newState, events } = startNewHand(this.gameState);
@@ -255,8 +272,18 @@ export class LocalGameManager {
 
   // イベント処理
   private processEvents(events: GameEvent[]): void {
-    // イベントはログ等に使えるが、ここでは特に追加処理なし
-    // HIT公開やフェーズ変更はゲームステートに反映済み
+    // Record player actions for hand history
+    for (const event of events) {
+      if (event.type === 'player_action' && this.gameState) {
+        this.handActions.push({
+          playerName: event.action.playerName,
+          playerId: event.action.playerId,
+          action: event.action.type,
+          amount: event.action.amount,
+          phase: this.gameState.phase,
+        });
+      }
+    }
   }
 
   // ハンド終了処理
@@ -276,6 +303,48 @@ export class LocalGameManager {
       this.callbacks.onShowdown(showdownCards);
     }
     this.callbacks.onHandResult(result);
+
+    // Build hand history entry
+    if (this.gameState && this.callbacks.onHandHistoryEntry) {
+      const humanPlayer = this.gameState.players.find(p => p.id === this.playerId);
+      const myHoleCards = humanPlayer?.holeCards ?? [];
+      const myHandName = myHoleCards.length === 2 && this.gameState.board.length >= 3
+        ? evaluateBestHand([...myHoleCards, ...this.gameState.board]).name
+        : humanPlayer?.folded ? 'Folded' : 'Unknown';
+
+      // Group actions by player
+      const playerMap = new Map<string, HandHistoryPlayer>();
+      for (const p of this.gameState.players) {
+        playerMap.set(p.id, {
+          playerId: p.id,
+          playerName: p.name,
+          actions: this.handActions.filter(a => a.playerId === p.id),
+          finalStack: p.stack,
+          folded: p.folded,
+        });
+      }
+
+      const entry = createHandHistoryEntry({
+        handNumber: this.gameState.handNumber,
+        board: [...this.gameState.board],
+        players: Array.from(playerMap.values()),
+        winners: result.winners.map(w => ({
+          playerId: w.playerId,
+          playerName: this.gameState!.players.find(p => p.id === w.playerId)?.name ?? '?',
+          amount: w.amount,
+          handName: w.handName,
+        })),
+        myHoleCards: [...myHoleCards],
+        myHandName,
+        potTotal: result.pot,
+        myStartStack: this.handStartStacks.get(this.playerId) ?? GAME_CONSTANTS.STARTING_STACK,
+        myEndStack: humanPlayer?.stack ?? 0,
+        myPlayerId: this.playerId,
+        myIsBB: humanPlayer?.isBB ?? false,
+      });
+
+      this.callbacks.onHandHistoryEntry(entry);
+    }
 
     // 結果表示後に次のハンドへ
     setTimeout(() => {

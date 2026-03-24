@@ -5,6 +5,7 @@ import { Card } from '../../shared/types/card';
 import { ClientGameState, ActionType, GamePhase } from '../../shared/types/game';
 import { ClientPlayerState } from '../../shared/types/player';
 import { ChatMessage, HandResult } from '../../shared/types/socket';
+import { HandHistoryEntry, trimHistory } from '../lib/hand-history';
 
 // ショーダウンで公開されたカード（playerId -> Card[]）
 export type ShowdownCards = Map<string, Card[]>;
@@ -20,6 +21,8 @@ interface GameStore {
   lastResult: HandResult | null;
   showdownCards: ShowdownCards;
   isPracticeMode: boolean;
+  handHistory: HandHistoryEntry[];
+  activeEmote: { playerId: string; emote: string; timestamp: number } | null;
 
   // ベットUI状態
   betMode: boolean;
@@ -37,6 +40,8 @@ interface GameStore {
   setLastResult: (result: HandResult | null) => void;
   setShowdownCards: (cards: ShowdownCards) => void;
   setIsPracticeMode: (mode: boolean) => void;
+  addHandHistory: (entry: HandHistoryEntry) => void;
+  setActiveEmote: (emote: { playerId: string; emote: string; timestamp: number } | null) => void;
   reset: () => void;
 }
 
@@ -51,6 +56,8 @@ export const useGameStore = create<GameStore>((set) => ({
   lastResult: null,
   showdownCards: new Map(),
   isPracticeMode: false,
+  handHistory: [],
+  activeEmote: null,
   betMode: false,
   betAmount: 0,
 
@@ -70,6 +77,10 @@ export const useGameStore = create<GameStore>((set) => ({
   setLastResult: (result) => set({ lastResult: result }),
   setShowdownCards: (cards) => set({ showdownCards: cards }),
   setIsPracticeMode: (mode) => set({ isPracticeMode: mode }),
+  addHandHistory: (entry) => set((s) => ({
+    handHistory: trimHistory([...s.handHistory, entry]),
+  })),
+  setActiveEmote: (emote) => set({ activeEmote: emote }),
   reset: () => set({
     gameState: null,
     myHoleCards: [],
@@ -81,6 +92,8 @@ export const useGameStore = create<GameStore>((set) => ({
     lastResult: null,
     showdownCards: new Map(),
     isPracticeMode: false,
+    handHistory: [],
+    activeEmote: null,
     betMode: false,
     betAmount: 0,
   }),

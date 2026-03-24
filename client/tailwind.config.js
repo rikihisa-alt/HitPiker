@@ -78,6 +78,11 @@ module.exports = {
           '85%': { backgroundColor: 'var(--danger)' },
           '100%': { width: '0%', backgroundColor: 'var(--danger)' },
         },
+        'emote-float': {
+          '0%': { opacity: '1', transform: 'translateX(-50%) translateY(0)' },
+          '70%': { opacity: '1', transform: 'translateX(-50%) translateY(-12px)' },
+          '100%': { opacity: '0', transform: 'translateX(-50%) translateY(-24px)' },
+        },
       },
       animation: {
         'turn-glow': 'turn-glow 2s ease-in-out infinite',

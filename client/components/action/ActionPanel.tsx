@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useGameState } from '../../hooks/useGameState';
 import { useGameStore } from '../../store/game-store';
 import { useBetControl } from '../../hooks/useBetControl';
@@ -33,12 +33,63 @@ export default function ActionPanel() {
     setAllIn,
   } = useBetControl();
 
+  // All-in confirmation state
+  const [confirmAllIn, setConfirmAllIn] = useState(false);
+  const confirmTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear confirmation timer on unmount or when turn changes
+  useEffect(() => {
+    return () => {
+      if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    setConfirmAllIn(false);
+    if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+  }, [isMyTurn]);
+
   const handleAction = useCallback((type: GameAction['type'], amount?: number) => {
     if (!playerId) return;
     const action: GameAction = { playerId, type, amount };
     sendAction(action);
     closeBetMode();
+    setConfirmAllIn(false);
+    if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
   }, [playerId, sendAction, closeBetMode]);
+
+  const handleAllInClick = useCallback(() => {
+    if (confirmAllIn) {
+      handleAction('all-in');
+    } else {
+      setConfirmAllIn(true);
+      if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+      confirmTimerRef.current = setTimeout(() => {
+        setConfirmAllIn(false);
+      }, 3000);
+    }
+  }, [confirmAllIn, handleAction]);
+
+  // Handle bet/raise confirm with all-in guard (>50% of stack)
+  const handleBetConfirm = useCallback(() => {
+    if (!gameState || !playerId) return;
+    const myPlayer = gameState.players.find(p => p.id === playerId);
+    if (!myPlayer) return;
+
+    const isLargeBet = betAmount > myPlayer.stack * 0.5;
+    const canBet = availableActions.includes('bet');
+
+    if (isLargeBet && !confirmAllIn) {
+      setConfirmAllIn(true);
+      if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+      confirmTimerRef.current = setTimeout(() => {
+        setConfirmAllIn(false);
+      }, 3000);
+      return;
+    }
+
+    handleAction(canBet ? 'bet' : 'raise', betAmount);
+  }, [gameState, playerId, betAmount, availableActions, confirmAllIn, handleAction]);
 
   if (!isMyTurn || !gameState) return null;
 
@@ -119,14 +170,21 @@ export default function ActionPanel() {
           {canBetOrRaise && (
             betMode ? (
               <button
-                onClick={() => handleAction(canBet ? 'bet' : 'raise', betAmount)}
-                className="btn btn-caution flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]"
+                onClick={handleBetConfirm}
+                className={`btn flex-[1.3] py-2.5 text-sm font-semibold rounded-md active:scale-[0.97]
+                  ${confirmAllIn ? 'bg-danger text-danger-fg' : 'btn-caution'}`}
               >
                 <div className="flex flex-col items-center leading-tight">
-                  <span>{canBet ? 'BET' : 'RAISE'}</span>
-                  <span className="text-[10px] chip-amt opacity-70">
-                    {betAmount.toLocaleString()}
-                  </span>
+                  {confirmAllIn ? (
+                    <span>CONFIRM?</span>
+                  ) : (
+                    <>
+                      <span>{canBet ? 'BET' : 'RAISE'}</span>
+                      <span className="text-[10px] chip-amt opacity-70">
+                        {betAmount.toLocaleString()}
+                      </span>
+                    </>
+                  )}
                 </div>
               </button>
             ) : (
@@ -142,12 +200,18 @@ export default function ActionPanel() {
           {/* ALL-IN (fallback when bet/raise unavailable) */}
           {canAllIn && !canBetOrRaise && (
             <button
-              onClick={() => handleAction('all-in')}
-              className="btn flex-[1.3] py-2.5 text-sm font-bold rounded-md bg-danger text-danger-fg active:scale-[0.97]"
+              onClick={handleAllInClick}
+              className={`btn flex-[1.3] py-2.5 text-sm font-bold rounded-md active:scale-[0.97]
+                ${confirmAllIn ? 'bg-danger/80 text-danger-fg animate-pulse' : 'bg-danger text-danger-fg'}`}
             >
-              ALL-IN
+              {confirmAllIn ? 'CONFIRM ALL-IN?' : 'ALL-IN'}
             </button>
           )}
+        </div>
+
+        {/* Keyboard shortcut hints */}
+        <div className="text-[9px] text-text-muted opacity-50 text-center mt-1.5 tracking-wide select-none">
+          F:Fold  C:Call  R:Raise  A:All-in
         </div>
       </div>
     </div>
