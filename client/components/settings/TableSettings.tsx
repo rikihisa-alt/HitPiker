@@ -17,7 +17,7 @@ const STACK_OPTIONS: { value: StackDisplay; label: string }[] = [
 ];
 
 interface TableSettingsProps {
-  onSettingsChange: (settings: Settings) => void;
+  onSettingsChange?: (settings: Settings) => void;
 }
 
 export default function TableSettings({ onSettingsChange }: TableSettingsProps) {
@@ -42,14 +42,14 @@ export default function TableSettings({ onSettingsChange }: TableSettingsProps) 
       const next = { ...settings, ...patch };
       setSettings(next);
       saveSettings(next);
-      onSettingsChange(next);
+      onSettingsChange?.(next);
     },
     [settings, onSettingsChange],
   );
 
   // Emit initial settings on mount
   useEffect(() => {
-    onSettingsChange(settings);
+    onSettingsChange?.(settings);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -15,6 +15,7 @@ import EmotePanel from '../../../components/table/EmotePanel';
 import HandHistoryPanel from '../../../components/history/HandHistoryPanel';
 import SessionStats from '../../../components/stats/SessionStats';
 import EquityBar from '../../../components/table/EquityBar';
+import TableSettings from '../../../components/settings/TableSettings';
 
 export default function RoomPage() {
   const params = useParams();
@@ -103,6 +104,7 @@ export default function RoomPage() {
               Start Game
             </button>
           )}
+          <TableSettings />
         </div>
       </div>
 
